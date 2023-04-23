@@ -21,7 +21,7 @@ class FinalProject1BackendApplicationTests {
              ResultSet resultSet = preparedStatement.executeQuery(); )
         {
             resultSet.next();
-            System.out.println(resultSet.getString(1));
+            System.out.println("now : "+resultSet.getString(1));
         } catch (SQLException e) {
             e.printStackTrace();
         }
