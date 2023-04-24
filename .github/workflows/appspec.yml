@@ -3,10 +3,10 @@ os: linux
 
 files:
   - source: /
-    destination: /opt/final-projcet-1
+    destination: /deploy/final-projcet-1
 
 permissions:
-  - object: /opt/final-projcet-1/
+  - object: /deploy/final-projcet-1/
     owner: ubuntu
     group: ubuntu
     mode: 755
