@@ -20,30 +20,9 @@ public class TestController {
 
     @GetMapping("/now")
     public Map<String,String> getNow(){
-        String now = "";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("select now()");
-             ResultSet resultSet = preparedStatement.executeQuery(); )
-        {
-            resultSet.next();
-            now = resultSet.getString(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String now = "asdghh";
+        
         return Map.of("Now",now);
     }
-    @GetMapping("/test")
-    public Map<String,String> login(){
-        String now = "";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("select now()");
-             ResultSet resultSet = preparedStatement.executeQuery(); )
-        {
-            resultSet.next();
-            now = resultSet.getString(1);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Map.of("Now",now);
-    }
+    
 }
