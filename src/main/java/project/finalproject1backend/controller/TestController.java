@@ -32,4 +32,9 @@ public class TestController {
         }
         return Map.of("Now",now);
     }
+    @GetMapping("/test")
+    public String test(){
+        String test = "자동배포 테스트중";
+        return test;
+    }
 }
