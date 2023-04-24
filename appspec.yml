@@ -1,18 +1,18 @@
 version: 0.0
 os: linux
-
 files:
   - source: /
-    destination: /FastCampus-Final-Project-bizcurator-1/FinalProject-1-Backend
+    destination: /home/ubuntu/app/
+    overwrite: yes
 
 permissions:
-  - object: /FastCampus-Final-Project-bizcurator-1/FinalProject-1-Backend
+  - object: /
+    pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: 755
+
 hooks:
-  AfterInstall:
-    # location은 프로젝트의 root경로를 기준
+  ApplicationStart:
     - location: deploy.sh
       timeout: 60
-      runas: root
+      runas: ubuntu
