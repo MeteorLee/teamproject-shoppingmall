@@ -46,7 +46,7 @@ jobs:
       run: cp ./scripts/*.sh ./deploy
 
     - name: Make zip file
-      run: zip -r ./schedule.zip ./deploy
+      run: zip -r ./final-projcet-1.zip ./deploy
       shell: bash
 
     - name: Configure AWS credentials
