@@ -3,10 +3,10 @@ name: Schedule Management server CI/CD
 on:
   push:
     branches:
-      -main
+      - main
   pull_request:
     branches:
-      -main
+      - main
 
 env:
   S3_BUCKET_NAME: final-projcet-1
