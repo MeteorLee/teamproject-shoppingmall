@@ -32,9 +32,18 @@ public class TestController {
         }
         return Map.of("Now",now);
     }
-    @GetMapping("/test")
-    public String test(){
-        String test = "자동배포 테스트중";
-        return test;
+    @GetMapping("/login")
+    public Map<String,String> login(){
+        String now = "";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select now()");
+             ResultSet resultSet = preparedStatement.executeQuery(); )
+        {
+            resultSet.next();
+            now = resultSet.getString(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Map.of("Now",now);
     }
 }
