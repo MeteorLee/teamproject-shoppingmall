@@ -65,8 +65,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
           aws deploy create-deployment \
-          --application-name final-projcet-1 \
-          --deployment-group-name finalprojcet \
+          --application-name final-project-1 \
+          --deployment-group-name final-project-1 \
           --file-exists-behavior OVERWRITE \
           --s3-location bucket=final-projcet-1,bundleType=zip,key=final-projcet-1.zip \
           --region ap-northeast-2
