@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/opt/final-project-1
+REPOSITORY=/FastCampus-Final-Project-bizcurator-1/FinalProject-1-Backend
 cd $REPOSITORY
 
 APP_NAME=SpringStudy
