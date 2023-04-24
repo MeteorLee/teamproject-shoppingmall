@@ -3,10 +3,10 @@ os: linux
 
 files:
   - source: /
-    destination: /opt/final-project-1
+    destination: /FastCampus-Final-Project-bizcurator-1/FinalProject-1-Backend
 
 permissions:
-  - object: /opt/final-project-1/
+  - object: /FastCampus-Final-Project-bizcurator-1/FinalProject-1-Backend
     owner: ubuntu
     group: ubuntu
     mode: 755
