@@ -32,7 +32,7 @@ public class TestController {
         }
         return Map.of("Now",now);
     }
-    @GetMapping("/login")
+    @GetMapping("/test")
     public Map<String,String> login(){
         String now = "";
         try (Connection connection = dataSource.getConnection();
