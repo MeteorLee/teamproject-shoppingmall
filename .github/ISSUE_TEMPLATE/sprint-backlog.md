@@ -2,7 +2,7 @@
 name: Sprint Backlog
 about: 스프링트 백로그 생성을 위해 이 템플릿을 사용하세요.
 title: "[Backlog]"
-labels: ''
+labels: 'Domain: Backend, Priority: Medium, Status: Available, Type: Enhancement'
 assignees: ''
 
 ---
