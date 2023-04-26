@@ -107,10 +107,11 @@ public class SecurityConfig {
         log.info("-------------web configure-------------");
 //        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
         return (web) -> web.ignoring().antMatchers(
-                "/v3/api-docs/**",
+//                "/**"                 // 임시로 모든 보안 해제시 셋팅!
+                "/api-docs/**",
                 "/swagger-ui/**",
                 "/test"
         );
-        // "/**"  임시로 모든 보안 해제시 셋팅!
+
     }
 }
