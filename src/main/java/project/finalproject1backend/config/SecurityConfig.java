@@ -87,7 +87,7 @@ public class SecurityConfig {
 //                .anyRequest().permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
-                .requestMatchers("/", "/signup", "/login","/now").permitAll()
+                .antMatchers("/", "/signup", "/login","/now").permitAll()
 
 //                .requestMatchers("/schedule/admin/**", "/account/admin/**").hasRole("ADMIN")
 //                .requestMatchers(HttpMethod.POST, "/schedule/**", "/account/**").hasAnyRole("USER","ADMIN")
@@ -106,7 +106,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer(){
         log.info("-------------web configure-------------");
 //        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
-        return (web) -> web.ignoring().requestMatchers(
+        return (web) -> web.ignoring().antMatchers(
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/test"
