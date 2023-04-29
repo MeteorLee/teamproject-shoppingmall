@@ -36,7 +36,6 @@ public class User extends AuditingFields{
     private String ownerName;
 
     @Setter
-    @Convert(converter = Encrypt256.class)
     private LocalDate openingDate;
 
     @Setter
@@ -61,12 +60,12 @@ public class User extends AuditingFields{
     private String phoneNumber;
 
     //유저의 현황 관련
-    @OneToMany(mappedBy = "User", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "orderUser", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<Order> orders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "User", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "inquiryUser", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<Inquiry> inquiries = new ArrayList<>();
