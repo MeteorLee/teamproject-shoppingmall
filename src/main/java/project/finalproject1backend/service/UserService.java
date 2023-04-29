@@ -10,10 +10,12 @@ import project.finalproject1backend.domain.User;
 import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.UserSignUpRequestDTO;
+import project.finalproject1backend.dto.user.UserLoginRequestDTO;
+import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
 import project.finalproject1backend.repository.UserRepository;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -42,5 +44,16 @@ public class UserService {
                 .build();
         userRepository.save(user);
         return new ResponseEntity<>(ResponseDTO.builder().code("200").status("success").build(), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> login(UserLoginRequestDTO requestDTO) {
+        if(!userRepository.existsByUserId(requestDTO.getUserId())) {
+            return new ResponseEntity<>(ErrorDTO.builder().code("400").message("checkId").build(), HttpStatus.BAD_REQUEST);
+        }
+        Optional<User> user = userRepository.findByUserId(requestDTO.getUserId());
+        if(!passwordEncoder.matches(requestDTO.getPassword(),user.get().getPassword() )){
+            return new ResponseEntity<>(ErrorDTO.builder().code("400").message("checkPassword").build(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

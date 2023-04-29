@@ -1,4 +1,4 @@
-package project.finalproject1backend.dto;
+package project.finalproject1backend.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

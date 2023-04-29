@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.UserSignUpRequestDTO;
+import project.finalproject1backend.dto.user.UserLoginRequestDTO;
+import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
 import project.finalproject1backend.service.UserService;
 
 import javax.validation.Valid;
@@ -35,7 +36,18 @@ public class UserController {
     })
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody @Valid UserSignUpRequestDTO requestDTO,
-                                              BindingResult bindingResult) throws Exception {
-        return new ResponseEntity<>(userService.signUp(requestDTO), HttpStatus.OK);
+                                              BindingResult bindingResult) {
+        return userService.signUp(requestDTO);
+    }
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "로그인 메서드", description = "로그인 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequestDTO requestDTO,
+                                    BindingResult bindingResult) {
+        return userService.login(requestDTO);
     }
 }
