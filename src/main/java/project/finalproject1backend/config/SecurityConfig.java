@@ -21,6 +21,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import project.finalproject1backend.jwt.JwtAccessDeniedHandler;
+import project.finalproject1backend.jwt.JwtAuthenticationEntryPoint;
+import project.finalproject1backend.jwt.JwtAuthenticationFilter;
+import project.finalproject1backend.jwt.JwtTokenProvider;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -28,9 +32,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-//    private final JwtTokenProvider jwtTokenProvider;
-//    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-//    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 //
 //    private final UserDetailsService userDetailsService;
 
@@ -89,15 +93,12 @@ public class SecurityConfig {
 
                 .antMatchers("/", "/signup", "/login","/now").permitAll()
 
-//                .requestMatchers("/schedule/admin/**", "/account/admin/**").hasRole("ADMIN")
-//                .requestMatchers(HttpMethod.POST, "/schedule/**", "/account/**").hasAnyRole("USER","ADMIN")
                 .anyRequest().authenticated()
-//                .and()
-//                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-//
-//                .exceptionHandling()
-//                .authenticationEntryPoint(jwtAuthenticationEntryPoint) //  401 UNAUTHORIZED
-//                .accessDeniedHandler(jwtAccessDeniedHandler) // 403 FORBIDDEN
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint) //  401 UNAUTHORIZED
+                .accessDeniedHandler(jwtAccessDeniedHandler) // 403 FORBIDDEN
                 .and().build();
     }
 

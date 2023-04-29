@@ -11,7 +11,9 @@ import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.user.UserLoginRequestDTO;
+import project.finalproject1backend.dto.user.UserLoginResponseDTO;
 import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
+import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.UserRepository;
 
 import java.util.HashSet;
@@ -23,6 +25,8 @@ import java.util.Set;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
@@ -54,6 +58,7 @@ public class UserService {
         if(!passwordEncoder.matches(requestDTO.getPassword(),user.get().getPassword() )){
             return new ResponseEntity<>(ErrorDTO.builder().code("400").message("checkPassword").build(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        String token = jwtTokenProvider.createToken(user.get().getUserId());
+        return new ResponseEntity<>(new UserLoginResponseDTO("200",token),HttpStatus.OK);
     }
 }
