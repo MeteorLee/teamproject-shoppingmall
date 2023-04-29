@@ -2,11 +2,13 @@ package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.domain.UserRole;
+import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UserSignUpRequestDTO;
 import project.finalproject1backend.repository.UserRepository;
@@ -20,9 +22,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public ResponseDTO signUp(UserSignUpRequestDTO requestDTO){
+    public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
-            throw new IllegalArgumentException("existId");
+            return new ResponseEntity<>(ErrorDTO.builder().code("400").message("existId").build(), HttpStatus.BAD_REQUEST);
         }
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.ROLE_STANDBY);
@@ -39,6 +41,6 @@ public class UserService {
                 .role(roles)
                 .build();
         userRepository.save(user);
-        return ResponseDTO.builder().code("200").status("success").build();
+        return new ResponseEntity<>(ResponseDTO.builder().code("200").status("success").build(), HttpStatus.OK);
     }
 }
