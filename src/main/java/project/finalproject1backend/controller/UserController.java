@@ -12,16 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.finalproject1backend.dto.ErrorDTO;
+import project.finalproject1backend.dto.ModifyRequestDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.user.UserLoginRequestDTO;
-import project.finalproject1backend.dto.user.UserLoginResponseDTO;
-import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
+import project.finalproject1backend.dto.user.*;
 import project.finalproject1backend.service.UserService;
 
 import javax.validation.Valid;
@@ -64,5 +60,40 @@ public class UserController {
     @PostMapping("/account/delete")
     public ResponseEntity<?> delete(@AuthenticationPrincipal PrincipalDTO principal) {
         return userService.delete(principal);
+    }
+
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(account 정보 조회)", description = "마이 페이지(account 정보 조회) 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/account")
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal PrincipalDTO principal) {
+        return new ResponseEntity<>(new UserInfoResponseDTO(principal),HttpStatus.OK);
+    }
+
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(account 정보수정)", description = "마이 페이지(account 정보수정) 메서드입니다.'password','phoneNumber','managerName','email' 수정 가능합니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ModifyRequestDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/account/modify")
+    public ResponseEntity<?> modify(@AuthenticationPrincipal PrincipalDTO principal, @RequestBody ModifyRequestDTO modifyRequestDTO) {
+        return userService.modify(principal,modifyRequestDTO);
+    }
+
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(account 정보수정) ⇒ 사업자등록증수정", description = "마이 페이지(account 정보수정)⇒ 사업자등록증수정 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/account/modifyLicense")
+    public ResponseEntity<?> modifyLicense(@AuthenticationPrincipal PrincipalDTO principal, @RequestBody UserModifyLicenseRequestDTO modifyRequestDTO) {
+        return userService.modifyLicense(principal,modifyRequestDTO);
     }
 }
