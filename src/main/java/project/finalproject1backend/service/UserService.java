@@ -11,8 +11,10 @@ import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
+import project.finalproject1backend.dto.ModifyRequestDTO;
 import project.finalproject1backend.dto.user.UserLoginRequestDTO;
 import project.finalproject1backend.dto.user.UserLoginResponseDTO;
+import project.finalproject1backend.dto.user.UserModifyLicenseRequestDTO;
 import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
 import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.UserRepository;
@@ -65,6 +67,43 @@ public class UserService {
 
     public ResponseEntity<?> delete(PrincipalDTO principal) {
         userRepository.deleteById(principal.getId());
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> modify(PrincipalDTO principal, ModifyRequestDTO modifyRequestDTO) {
+        if(modifyRequestDTO.content==null){
+            return new ResponseEntity<>(new ErrorDTO("400","checkModify"), HttpStatus.BAD_REQUEST);
+        }
+        Optional<User> user=userRepository.findById(principal.getId());
+        String[] contents = {"password","phoneNumber","managerName","email"};
+        switch (modifyRequestDTO.content){
+            case "password":
+                user.get().setPassword(passwordEncoder.encode(modifyRequestDTO.value));
+                break;
+            case "phoneNumber":
+                user.get().setPhoneNumber(modifyRequestDTO.value);
+                break;
+            case "managerName":
+                user.get().setManagerName(modifyRequestDTO.value);
+                break;
+            case "email":
+                user.get().setEmail(modifyRequestDTO.value);
+                break;
+        }
+        userRepository.save(user.get());
+        return new ResponseEntity<>(modifyRequestDTO, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> modifyLicense(PrincipalDTO principal, UserModifyLicenseRequestDTO modifyRequestDTO) {
+        if(!modifyRequestDTO.nullCheck()){
+            return new ResponseEntity<>(new ErrorDTO("400","checkNull"), HttpStatus.BAD_REQUEST);
+        }
+        Optional<User> user=userRepository.findById(principal.getId());
+        user.get().setOwnerName(modifyRequestDTO.getOwnerName());
+        user.get().setOpeningDate(modifyRequestDTO.getOpeningDate());
+        user.get().setCorporateNumber(modifyRequestDTO.getCorporateNumber());
+        user.get().setBusinessLicense(modifyRequestDTO.getBusinessLicense());
+        userRepository.save(user.get());
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 }
