@@ -37,6 +37,11 @@ dependencies {
     // springdoc을 이용한 Swagger
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.9'
 
+    //jjwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.7'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.10.7'
+
 }
 
 tasks.named('test') {
