@@ -3,7 +3,7 @@ package project.finalproject1backend.domain;
 import javax.persistence.*;
 
 @Entity
-public class Order {
+public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

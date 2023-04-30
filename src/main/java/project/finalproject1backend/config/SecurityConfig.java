@@ -1,5 +1,8 @@
 package project.finalproject1backend.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +68,13 @@ public class SecurityConfig {
 
         return source;
     }
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("bearer-key",
+                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -92,6 +102,7 @@ public class SecurityConfig {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
                 .antMatchers("/", "/signup", "/login","/now").permitAll()
+                .antMatchers("/account/**").hasAnyRole("STANDBY","USER", "ADMIN")
 
                 .anyRequest().authenticated()
                 .and()

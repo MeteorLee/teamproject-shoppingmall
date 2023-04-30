@@ -63,7 +63,8 @@ public class User extends AuditingFields{
     @OneToMany(mappedBy = "orderUser", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Order> orders = new ArrayList<>();
+    private List<Orders> orders = new ArrayList<>();
+    //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
 
     @OneToMany(mappedBy = "inquiryUser", cascade = CascadeType.ALL)
     @ToString.Exclude
