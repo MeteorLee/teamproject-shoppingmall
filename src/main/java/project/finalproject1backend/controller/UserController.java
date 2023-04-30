@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -96,5 +99,45 @@ public class UserController {
     @PostMapping("/account/modifyLicense")
     public ResponseEntity<?> modifyLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal, @RequestBody UserModifyLicenseRequestDTO modifyRequestDTO) {
         return userService.modifyLicense(principal,modifyRequestDTO);
+    }
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersGetResponseDTO.class))),
+    })
+    @GetMapping("/account/admin/users")
+    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return userService.getUsers(pageable);
+    }
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리) 선택조회", description = "관리자 페이지(고객관리) 선택조회 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
+    })
+    @GetMapping("/account/admin/users/{userId}")
+    public ResponseEntity<?> getUserInfo(@PathVariable String userId) {
+        return userService.getUserInfo(userId);
+    }
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리)ROLE_USER로 변경", description = "관리자 페이지(고객관리)ROLE_USER로 변경 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+    })
+    @PostMapping("/account/admin/users/roleUser/{userId}")
+    public ResponseEntity<?> setRoleUser(@PathVariable String userId) {
+        return userService.roleUser(userId);
+    }
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리)ROLE_STANDBY로 변경", description = "관리자 페이지(고객관리)ROLE_STANDBY로 변경 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+    })
+    @PostMapping("/account/admin/users/roleStandby/{userId}")
+    public ResponseEntity<?> setRoleStandby(@PathVariable String userId) {
+        return userService.roleStandby(userId);
     }
 }

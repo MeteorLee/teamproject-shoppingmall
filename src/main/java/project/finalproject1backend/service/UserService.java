@@ -1,6 +1,8 @@
 package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,16 +14,11 @@ import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.ModifyRequestDTO;
-import project.finalproject1backend.dto.user.UserLoginRequestDTO;
-import project.finalproject1backend.dto.user.UserLoginResponseDTO;
-import project.finalproject1backend.dto.user.UserModifyLicenseRequestDTO;
-import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
+import project.finalproject1backend.dto.user.*;
 import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.UserRepository;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -112,6 +109,34 @@ public class UserService {
         user.get().setOpeningDate(modifyRequestDTO.getOpeningDate());
         user.get().setCorporateNumber(modifyRequestDTO.getCorporateNumber());
         user.get().setBusinessLicense(modifyRequestDTO.getBusinessLicense());
+        userRepository.save(user.get());
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getUsers(Pageable pageable) {
+        // list로 주기
+        List<UserInfoResponseDTO> userList = userRepository.findAll().stream().map(user1 -> UserInfoResponseDTO.from(user1)).toList();
+        // page로 주기
+        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
+        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getUserInfo(String userId) {
+        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::from), HttpStatus.OK);
+    }
+    public ResponseEntity<?> roleUser(String userId){
+        Set<UserRole> roleUser = new HashSet<>();
+        roleUser.add(UserRole.ROLE_USER);
+        Optional<User> user = userRepository.findByUserId(userId);
+        user.get().setRole(roleUser);
+        userRepository.save(user.get());
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+    public ResponseEntity<?> roleStandby(String userId){
+        Set<UserRole> roleStandby = new HashSet<>();
+        roleStandby.add(UserRole.ROLE_STANDBY);
+        Optional<User> user = userRepository.findByUserId(userId);
+        user.get().setRole(roleStandby);
         userRepository.save(user.get());
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }

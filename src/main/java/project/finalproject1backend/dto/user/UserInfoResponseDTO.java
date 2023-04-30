@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import project.finalproject1backend.domain.User;
 import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.PrincipalDTO;
 
@@ -33,6 +34,19 @@ public class UserInfoResponseDTO {
         this.phoneNumber = dto.getPhoneNumber();
         this.email = dto.getEmail();
         this.role = dto.getRole().iterator().next();
+    }
+    public static UserInfoResponseDTO from(User user){
+        return UserInfoResponseDTO.builder()
+        .userId(user.getUserId())
+        .ownerName(user.getOwnerName())
+        .openingDate(user.getOpeningDate())
+        .corporateNumber(user.getCorporateNumber())
+        .businessLicense(user.getBusinessLicense())
+        .managerName(user.getManagerName())
+        .phoneNumber(user.getPhoneNumber())
+        .email(user.getEmail())
+        .role(user.getRole().iterator().next())
+                .build();
     }
 }
 /*
