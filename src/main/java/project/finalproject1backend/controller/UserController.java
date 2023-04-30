@@ -1,6 +1,7 @@
 package project.finalproject1backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,7 +59,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @PostMapping("/account/delete")
-    public ResponseEntity<?> delete(@AuthenticationPrincipal PrincipalDTO principal) {
+    public ResponseEntity<?> delete(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
         return userService.delete(principal);
     }
 
@@ -69,7 +70,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @GetMapping("/account")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal PrincipalDTO principal) {
+    public ResponseEntity<?> getUser(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
         return new ResponseEntity<>(new UserInfoResponseDTO(principal),HttpStatus.OK);
     }
 
@@ -81,7 +82,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @PostMapping("/account/modify")
-    public ResponseEntity<?> modify(@AuthenticationPrincipal PrincipalDTO principal, @RequestBody ModifyRequestDTO modifyRequestDTO) {
+    public ResponseEntity<?> modify(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal, @RequestBody ModifyRequestDTO modifyRequestDTO) {
         return userService.modify(principal,modifyRequestDTO);
     }
 
@@ -93,7 +94,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @PostMapping("/account/modifyLicense")
-    public ResponseEntity<?> modifyLicense(@AuthenticationPrincipal PrincipalDTO principal, @RequestBody UserModifyLicenseRequestDTO modifyRequestDTO) {
+    public ResponseEntity<?> modifyLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal, @RequestBody UserModifyLicenseRequestDTO modifyRequestDTO) {
         return userService.modifyLicense(principal,modifyRequestDTO);
     }
 }

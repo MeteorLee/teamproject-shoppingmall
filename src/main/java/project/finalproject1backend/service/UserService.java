@@ -72,10 +72,19 @@ public class UserService {
 
     public ResponseEntity<?> modify(PrincipalDTO principal, ModifyRequestDTO modifyRequestDTO) {
         if(modifyRequestDTO.content==null){
-            return new ResponseEntity<>(new ErrorDTO("400","checkModify"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
+        }
+        String[] contents = {"password","phoneNumber","managerName","email"};
+        int count =0;
+        for (String s:contents) {
+            if(s.equals(modifyRequestDTO.content)){
+                count++;
+            }
+        }
+        if(count==0){
+            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
         }
         Optional<User> user=userRepository.findById(principal.getId());
-        String[] contents = {"password","phoneNumber","managerName","email"};
         switch (modifyRequestDTO.content){
             case "password":
                 user.get().setPassword(passwordEncoder.encode(modifyRequestDTO.value));
