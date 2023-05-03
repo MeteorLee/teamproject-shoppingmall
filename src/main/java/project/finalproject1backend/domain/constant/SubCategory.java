@@ -1,6 +1,8 @@
 package project.finalproject1backend.domain.constant;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import project.finalproject1backend.domain.AuditingFields;
 
@@ -12,6 +14,7 @@ import java.util.Set;
 @Table(name="sub_category")
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class SubCategory extends AuditingFields {
 
     @Id
@@ -27,6 +30,7 @@ public class SubCategory extends AuditingFields {
 
     @OneToMany(mappedBy = "subCategory")
     private Set<DetailCategory> detailCategories = new HashSet<>();
+
 
 
 }

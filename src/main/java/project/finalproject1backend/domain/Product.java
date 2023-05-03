@@ -7,6 +7,8 @@ import project.finalproject1backend.domain.constant.Delivery;
 import project.finalproject1backend.domain.constant.DetailCategory;
 import project.finalproject1backend.domain.constant.MainCategory;
 import project.finalproject1backend.domain.constant.SubCategory;
+import project.finalproject1backend.dto.product.ProductFormDto;
+import project.finalproject1backend.exception.OutOfStockException;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -26,21 +28,25 @@ public class Product extends AuditingFields{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Column(nullable = false, length = 50)
-    private String product_Name;   //상품명
-
-    @Setter
-    @Column(name="price", nullable = false)
-    private int consumer_price;   //소비자가
-
-    @Setter
-    @Column(name="price", nullable = false)
-    private int product_price;   //판매가
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Setter
     @Column(nullable = false, length = 50)
-    private String Manufacturer;   //제조사
+    private String productName;   //상품명
+
+    @Setter
+    @Column(nullable = false, length = 50)
+    private int consumerPrice;   //소비자가
+
+    @Setter
+    @Column(nullable = false, length = 50)
+    private int productPrice;   //판매가
+
+    @Setter
+    @Column(nullable = false, length = 50)
+    private String manufacturer;   //제조사
 
     @Setter
     @Column(nullable = false)
@@ -51,13 +57,11 @@ public class Product extends AuditingFields{
     private int stockNumber;     //재고수량
 
     @Setter
-    private int delivery_charge;    //배송비
+    private int deliveryCharge;    //배송비
 
     @Setter
     @Column(nullable = false)
-    private int Minimum_quantity;     //최소수량
-    @Setter
-    private String product_image;    //상품이미지
+    private int minimumQuantity;     //최소수량
 
     @Setter
     private MainCategory maincategory;  //대분류
@@ -73,7 +77,7 @@ public class Product extends AuditingFields{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;s
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
         return Objects.equals(id, product.id);
@@ -83,4 +87,33 @@ public class Product extends AuditingFields{
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public void updateProduct(ProductFormDto productFormDto){
+        this.productName = productFormDto.getProductName();
+        this.consumerPrice = productFormDto.getConsumerPrice();
+        this.productPrice = productFormDto.getProductPrice();
+        this.manufacturer = productFormDto.getManufacturer();
+        this.delivery = productFormDto.getDelivery();
+        this.stockNumber = productFormDto.getStockNumber();
+        this.deliveryCharge = productFormDto.getDeliveryCharge();
+        this.minimumQuantity = productFormDto.getMinimumQuantity();
+        this.maincategory = productFormDto.getMaincategory();
+        this.subcategory = productFormDto.getSubcategory();
+        this.detailcategory = productFormDto.getDetailcategory();
+    }
+
+
+    public void removeStock(int stockNumber){ //재고 수량 감소
+        int restStock = this.stockNumber - stockNumber;
+        if(restStock<0){
+            throw new OutOfStockException("상품의 재고가 부족 합니다. (현재 재고 수량: " + this.stockNumber + ")");
+        }
+        this.stockNumber = restStock;
+    }
+
+    public void addStock(int stockNumber){
+        this.stockNumber += stockNumber;
+    }
+
+
 }

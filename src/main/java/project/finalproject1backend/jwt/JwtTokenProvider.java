@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @RequiredArgsConstructor
+
 @Component
 public class JwtTokenProvider {
 
@@ -23,6 +24,8 @@ public class JwtTokenProvider {
     private long tokenValidTime = 30 * 60 * 1000L;
 
     private final UserDetailsService userDetailsService;
+
+
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
 //    @PostConstruct

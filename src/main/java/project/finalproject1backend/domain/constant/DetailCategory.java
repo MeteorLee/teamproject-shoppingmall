@@ -1,6 +1,8 @@
 package project.finalproject1backend.domain.constant;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import project.finalproject1backend.domain.AuditingFields;
 
@@ -10,6 +12,7 @@ import javax.persistence.*;
 @Table(name="detail_category")
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class DetailCategory extends AuditingFields {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
