@@ -8,28 +8,32 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.Product;
 import project.finalproject1backend.domain.ProductImg;
+import project.finalproject1backend.domain.User;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.product.ProductFormDto;
 import project.finalproject1backend.repository.ProductImgRepository;
 import project.finalproject1backend.repository.ProductRepository;
+import project.finalproject1backend.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ProductService {
-
+    private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ProductImgService productImgService;
     private final ProductImgRepository productImgRepository;
 
-    public ResponseEntity<?> saveProduct( ProductFormDto productDto,List<MultipartFile> productImgFileList) throws Exception {
-        if(productRepository.existsById(productDto.getId())) {
-            return new ResponseEntity<>(new ErrorDTO("400","existId"), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> saveProduct(PrincipalDTO principal, ProductFormDto productDto,List<MultipartFile> productImgFileList) throws Exception {
+        Optional<User> user=userRepository.findById(principal.getId());
+        if(!user.isPresent()){
+            return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
         }
 
         //상품등록
@@ -53,8 +57,11 @@ public class ProductService {
     }
 
 
-
     public ResponseEntity<?>  updateProduct(PrincipalDTO principal, Long productId, ProductFormDto productFormDto, List<MultipartFile> itemImgFileList) throws Exception{
+        Optional<User> user=userRepository.findById(principal.getId());
+        if(!user.isPresent()){
+            return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
+        }
 
         Product id = productRepository.getReferenceById(productId);
         if(id == null) {

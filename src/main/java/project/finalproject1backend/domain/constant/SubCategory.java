@@ -28,8 +28,6 @@ public class SubCategory extends AuditingFields {
     @Column(name = "main_category", nullable = false, length = 20)
     private MainCategory mainCategory;
 
-    @OneToMany(mappedBy = "subCategory")
-    private Set<DetailCategory> detailCategories = new HashSet<>();
 
 
 

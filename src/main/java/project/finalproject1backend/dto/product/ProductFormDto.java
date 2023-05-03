@@ -39,7 +39,7 @@ public class ProductFormDto {
     @NotNull(message = "재고는 필수 입력 값입니다.")
     private int stockNumber;     //재고수량
 
-    private ItemSellStatus itemSellStatus;  //판매상태
+    private Status status;  //판매상태
 
     @NotNull(message = "배송비는 필수 입력 값입니다.")
     private int deliveryCharge;    //배송비
@@ -53,8 +53,8 @@ public class ProductFormDto {
     @NotBlank(message = "중분류는 필수 입력 항목입니다.")
     private SubCategory subcategory;  //중분류
 
-    @NotBlank(message = "소분류는 필수 입력 항목입니다.")
-    private DetailCategory detailcategory; //소분류
+    @NotBlank(message = "상품설명은 필수 입력 항목입니다.")
+    private String message;  //상품설명
 
 
     private List<ProductImgDto> ProductImgDtoList = new ArrayList<>();

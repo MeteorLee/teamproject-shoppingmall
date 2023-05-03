@@ -4,13 +4,14 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import project.finalproject1backend.domain.constant.Delivery;
-import project.finalproject1backend.domain.constant.DetailCategory;
+import project.finalproject1backend.domain.constant.Status;
 import project.finalproject1backend.domain.constant.MainCategory;
 import project.finalproject1backend.domain.constant.SubCategory;
 import project.finalproject1backend.dto.product.ProductFormDto;
 import project.finalproject1backend.exception.OutOfStockException;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Table(name="product")
@@ -54,25 +55,28 @@ public class Product extends AuditingFields{
 
     @Setter
     @Column(nullable = false)
-    private int stockNumber;     //재고수량
-
-    @Setter
     private int deliveryCharge;    //배송비
+    @Setter
+    @Column(nullable = false)
+    private int stockNumber;     //재고수량
 
     @Setter
     @Column(nullable = false)
     private int minimumQuantity;     //최소수량
 
     @Setter
+    private Status status;  //판매상태
+
+    @Setter
     private MainCategory maincategory;  //대분류
+
+    @Setter
+    private String message;  //상품설명
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_category_id")
     private SubCategory subcategory;  //중분류
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "detail_category_id")
-    private DetailCategory detailcategory; //소분류
 
 
     @Override
@@ -93,13 +97,16 @@ public class Product extends AuditingFields{
         this.consumerPrice = productFormDto.getConsumerPrice();
         this.productPrice = productFormDto.getProductPrice();
         this.manufacturer = productFormDto.getManufacturer();
+        this.status = productFormDto.getStatus();
+        this.minimumQuantity = productFormDto.getMinimumQuantity();
         this.delivery = productFormDto.getDelivery();
         this.stockNumber = productFormDto.getStockNumber();
         this.deliveryCharge = productFormDto.getDeliveryCharge();
         this.minimumQuantity = productFormDto.getMinimumQuantity();
         this.maincategory = productFormDto.getMaincategory();
         this.subcategory = productFormDto.getSubcategory();
-        this.detailcategory = productFormDto.getDetailcategory();
+        this.message = productFormDto.getMessage();
+
     }
 
 
