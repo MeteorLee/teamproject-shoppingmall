@@ -12,6 +12,8 @@ import project.finalproject1backend.exception.OutOfStockException;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Table(name="product")
@@ -28,10 +30,6 @@ public class Product extends AuditingFields{
     @Column(name="product_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @Setter
     @Column(nullable = false, length = 50)
@@ -77,6 +75,17 @@ public class Product extends AuditingFields{
     @JoinColumn(name = "sub_category_id")
     private SubCategory subcategory;  //중분류
 
+    //유저의 현황 관련
+    @OneToMany(mappedBy = "orderUser", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @Builder.Default
+    private List<Orders> orders = new ArrayList<>();
+
+    //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
+    @OneToMany(mappedBy = "inquiryUser", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @Builder.Default
+    private List<Inquiry> inquiries = new ArrayList<>();
 
 
     @Override

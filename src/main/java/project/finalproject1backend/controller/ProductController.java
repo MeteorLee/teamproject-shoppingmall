@@ -56,7 +56,7 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     // 상품수정
-    @PutMapping("/admin/products/{productId}")
+    @PostMapping("/admin/products/{productId}/edit")
     public ResponseEntity<?> modify(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal,
                                            @PathVariable("productId") Long productId,
                                            @RequestBody ProductFormDto productDto,
