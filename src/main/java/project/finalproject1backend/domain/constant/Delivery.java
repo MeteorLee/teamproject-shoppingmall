@@ -3,7 +3,6 @@ package project.finalproject1backend.domain.constant;
 import lombok.Getter;
 
 @Getter
-
 public enum Delivery {
 
 
