@@ -23,7 +23,6 @@ import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -34,7 +33,7 @@ public class ProductService {
     private final ProductImgService productImgService;
     private final ProductImgRepository productImgRepository;
 
-    public ResponseEntity<?> createProduct(PrincipalDTO principal, ProductFormDto productDto, List<MultipartFile> productImgFileList) throws Exception {
+    public ResponseEntity<?> saveProduct(PrincipalDTO principal, ProductFormDto productDto,List<MultipartFile> productImgFileList) throws Exception {
         Optional<User> user=userRepository.findById(principal.getId());
         if(!user.isPresent()){
             return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
@@ -48,10 +47,12 @@ public class ProductService {
         for(int i=0;i<productImgFileList.size();i++){
             ProductImg productImg = new ProductImg();
             productImg.setProduct(product);
+
             if(i == 0)
                 productImg.setRepimgYn("Y");
             else
                 productImg.setRepimgYn("N");
+
             productImgService.saveItemImg(productImg, productImgFileList.get(i));
         }
 
@@ -64,7 +65,10 @@ public class ProductService {
         if(!user.isPresent()){
             return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
         }
-
+        Product id = productRepository.getReferenceById(productId);
+        if(!id.getUser().getId().equals(principal.getId())) {
+            return new ResponseEntity<>(new ErrorDTO("400","notMatchId"), HttpStatus.BAD_REQUEST);
+        }
         try {
             // 상품 수정
             Product product = productRepository.findById(productFormDto.getId())
@@ -83,6 +87,7 @@ public class ProductService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorDTO("500", "서버 에러가 발생했습니다."));
         }
+
     }
 
 
@@ -91,21 +96,19 @@ public class ProductService {
         if(!user.isPresent()){
             return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
         }
-//        Product id = productRepository.getReferenceById(productId);
-//        if(!id.getUser().getId().equals(principal.getId())) {
-//            return new ResponseEntity<>(new ErrorDTO("400","notMatchId"), HttpStatus.BAD_REQUEST);
-//        }
+        Product id = productRepository.getReferenceById(productId);
+        if(!id.getUser().getId().equals(principal.getId())) {
+            return new ResponseEntity<>(new ErrorDTO("400","notMatchId"), HttpStatus.BAD_REQUEST);
+        }
         productRepository.deleteById(productId);
         productImgRepository.deleteById(productId);
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+
     }
 
-    public ResponseEntity<List<ProductFormDto>> getAllProducts() {
-        List<ProductFormDto> productDto = productRepository.findAll()
-                .stream()
-                .map(ProductFormDto::of)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDto);
+    public ResponseEntity<List<Product>> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     public ResponseEntity<List<Product>> getProductsByCategory(MainCategory mainCategory, String subCategoryName) {
@@ -122,13 +125,5 @@ public class ProductService {
     public ResponseEntity<List<Product>> getProductByRandom(String subCategory) {
         List<Product> products = productRepository.findRandomBySubCategoryName(subCategory);
         return new ResponseEntity<>(products, HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> getProduct(Long productId) {
-        ProductFormDto productFormDto = productRepository.findById(productId)
-                .map(ProductFormDto::of)
-                .orElseThrow(() -> new EntityNotFoundException("해당 상품이 존재하지 않습니다."));
-
-        return new ResponseEntity<>(productFormDto, HttpStatus.OK);
     }
 }
