@@ -68,8 +68,8 @@ public class ProductFormDto {
         return modelMapper.map(this, Product.class);
     }
 
-    public static ProductFormDto of(Product item){
-        return modelMapper.map(item, ProductFormDto.class);
+    public static ProductFormDto of(Product product){
+        return modelMapper.map(product, ProductFormDto.class);
     }
 
 }
