@@ -30,7 +30,8 @@ public class UserService {
 
     public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
-            return new ResponseEntity<>(new ErrorDTO("400","existId"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("existId");
+//            return new ResponseEntity<>(new ErrorDTO("400","existId"), HttpStatus.BAD_REQUEST);
         }
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.ROLE_STANDBY);
@@ -52,11 +53,13 @@ public class UserService {
 
     public ResponseEntity<?> login(UserLoginRequestDTO requestDTO) {
         if(!userRepository.existsByUserId(requestDTO.getUserId())) {
-            return new ResponseEntity<>(new ErrorDTO("400","checkId"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("checkId");
+//            return new ResponseEntity<>(new ErrorDTO("400","checkId"), HttpStatus.BAD_REQUEST);
         }
         Optional<User> user = userRepository.findByUserId(requestDTO.getUserId());
         if(!passwordEncoder.matches(requestDTO.getPassword(),user.get().getPassword() )){
-            return new ResponseEntity<>(new ErrorDTO("400","checkPassword"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("checkPassword");
+//            return new ResponseEntity<>(new ErrorDTO("400","checkPassword"), HttpStatus.BAD_REQUEST);
         }
         String token = jwtTokenProvider.createToken(user.get().getUserId());
         return new ResponseEntity<>(new UserLoginResponseDTO("200",token),HttpStatus.OK);
@@ -69,7 +72,8 @@ public class UserService {
 
     public ResponseEntity<?> modify(PrincipalDTO principal, ModifyRequestDTO modifyRequestDTO) {
         if(modifyRequestDTO.content==null){
-            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("checkContent");
+//            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
         }
         String[] contents = {"password","phoneNumber","managerName","email"};
         int count =0;
@@ -79,7 +83,8 @@ public class UserService {
             }
         }
         if(count==0){
-            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("checkContent");
+//            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
         }
         Optional<User> user=userRepository.findById(principal.getId());
         switch (modifyRequestDTO.content){
@@ -102,7 +107,8 @@ public class UserService {
 
     public ResponseEntity<?> modifyLicense(PrincipalDTO principal, UserModifyLicenseRequestDTO modifyRequestDTO) {
         if(!modifyRequestDTO.nullCheck()){
-            return new ResponseEntity<>(new ErrorDTO("400","checkNull"), HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("checkNull");
+//            return new ResponseEntity<>(new ErrorDTO("400","checkNull"), HttpStatus.BAD_REQUEST);
         }
         Optional<User> user=userRepository.findById(principal.getId());
         user.get().setOwnerName(modifyRequestDTO.getOwnerName());
