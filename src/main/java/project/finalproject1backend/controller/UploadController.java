@@ -23,7 +23,7 @@ public class UploadController {
     @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> upload(@RequestPart MultipartFile[] multipartFiles){
 
-        String path= "C:\\upload";
+        String path= "/home/ubuntu/FinalProject/upload/test";
         List<UploadDTO> result = new ArrayList<>();
         for (MultipartFile i: multipartFiles){
             result.add(attachmentUtil.upload(i,path));
