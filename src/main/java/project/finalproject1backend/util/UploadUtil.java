@@ -66,7 +66,7 @@ public class UploadUtil {
             removed = resource.getFile().delete();
             //이미지 파일이면 썸네일 파일도 생성
             if(contentType.startsWith("image")){
-                File thumbFile = new File("C:\\upload"+File.separator+"s_"+fileName);
+                File thumbFile = new File(path+File.separator+"s_"+fileName);
                 thumbFile.delete();
             }
         } catch (IOException e) {
