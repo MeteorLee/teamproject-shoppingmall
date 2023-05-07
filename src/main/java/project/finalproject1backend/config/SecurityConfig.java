@@ -101,7 +101,7 @@ public class SecurityConfig {
 //                .anyRequest().permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
-                .antMatchers("/", "/signup", "/login","/now").permitAll()
+                .antMatchers("/", "/signup", "/login","/upload/*","/upload/view/*","/upload/remove/*").permitAll()
                 .antMatchers("/account/**").hasAnyRole("STANDBY","USER", "ADMIN")
 
                 .anyRequest().authenticated()
