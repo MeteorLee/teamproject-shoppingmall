@@ -18,12 +18,12 @@ import java.util.Map;
 @RestController
 public class UploadController {
     UploadUtil attachmentUtil =new UploadUtil();
+    String path= "/home/ubuntu/FinalProject/upload/test";
     @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
     @Operation(summary = "upload 메서드", description = "업로드 메서드입니다.")
     @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> upload(@RequestPart MultipartFile[] multipartFiles){
 
-        String path= "/home/ubuntu/FinalProject/upload/test";
         List<UploadDTO> result = new ArrayList<>();
         for (MultipartFile i: multipartFiles){
             result.add(attachmentUtil.upload(i,path));
@@ -36,13 +36,13 @@ public class UploadController {
     @Operation(summary = "view 메서드", description = "view 메서드입니다.")
     @GetMapping("/view/{fileName}")
     public ResponseEntity<?> viewFile(@PathVariable String fileName){
-       return attachmentUtil.viewFile(fileName);
+       return attachmentUtil.viewFile(fileName,path);
     }
 
     @Tag(name = "테스트용 컨트롤러", description = "테스트용 컨트롤러")
     @Operation(summary = "delete 메서드", description = "delete 메서드입니다.")
     @DeleteMapping("/remove/{fileName}")
     public Map<String,Boolean> deleteFile(@PathVariable String fileName){
-        return attachmentUtil.deleteFile(fileName);
+        return attachmentUtil.deleteFile(fileName,path);
     }
 }

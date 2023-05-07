@@ -43,8 +43,8 @@ public class UploadUtil {
     }
 
     //파일 조회
-    public ResponseEntity<?> viewFile(String fileName){
-        Resource resource = new FileSystemResource("C:\\upload"+File.separator+fileName);
+    public ResponseEntity<?> viewFile(String fileName,String path){
+        Resource resource = new FileSystemResource(path+File.separator+fileName);
         String resourceName = resource.getFilename();
         HttpHeaders headers = new HttpHeaders();
 
@@ -56,8 +56,8 @@ public class UploadUtil {
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
-    public Map<String,Boolean> deleteFile(String fileName){
-        Resource resource = new FileSystemResource("C:\\upload"+File.separator+fileName);
+    public Map<String,Boolean> deleteFile(String fileName,String path){
+        Resource resource = new FileSystemResource(path+File.separator+fileName);
         String resourceName = resource.getFilename();
         Map<String,Boolean> resultMap = new HashMap<>();
         boolean removed = false;
