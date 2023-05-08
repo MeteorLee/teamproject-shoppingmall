@@ -203,4 +203,11 @@ public class UserService {
         userRepository.save(user.get());
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
+
+    public ResponseEntity<?> getUserCount() {
+        int standbyCount=userRepository.findByRole(UserRole.ROLE_STANDBY).size();;
+        int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();;
+        int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();;
+        return new ResponseEntity<>(new UserCountResponseDTO(standbyCount,userCount,refuseCount),HttpStatus.OK);
+    }
 }

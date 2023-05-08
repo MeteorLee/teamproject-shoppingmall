@@ -168,4 +168,15 @@ public class UserController {
     public ResponseEntity<?> setRoleRefuse(@PathVariable String userId) {
         return userService.roleRefuse(userId);
     }
+
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리)회원 수 조회", description = "관리자 페이지(고객관리)회원 수 조회 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserCountResponseDTO.class))),
+    })
+    @GetMapping("/account/admin/users/getUserCount/{content}")
+    public ResponseEntity<?> getUserCount() {
+        return userService.getUserCount();
+    }
 }
