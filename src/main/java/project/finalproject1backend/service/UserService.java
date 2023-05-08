@@ -228,4 +228,14 @@ public class UserService {
         int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();;
         return new ResponseEntity<>(new UserCountResponseDTO(standbyCount,userCount,refuseCount),HttpStatus.OK);
     }
+
+    public ResponseEntity<?> booleanBusinessLicense(PrincipalDTO principal) {
+        Boolean result;
+        if(principal.getBusinessLicense().isEmpty()||principal.getBusinessLicense()==null) {
+            result = false;
+        }
+        else {result=true;
+        }
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
 }

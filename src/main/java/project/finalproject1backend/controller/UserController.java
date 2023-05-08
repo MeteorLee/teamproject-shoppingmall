@@ -109,6 +109,16 @@ public class UserController {
     public ResponseEntity<?> modifyLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal, @RequestPart(value = "requestDTO") UserModifyLicenseRequestDTO modifyRequestDTO,@RequestPart(required = false) List<MultipartFile> businessLicense) {
         return userService.modifyLicense(principal,modifyRequestDTO,businessLicense);
     }
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(사업자등록 첨부여부 확인)", description = "마이 페이지(사업자등록 첨부여부 확인) 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping(value = "/account/businessLicense")
+    public ResponseEntity<?> booleanBusinessLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal) {
+        return userService.booleanBusinessLicense(principal);
+    }
 
 
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
