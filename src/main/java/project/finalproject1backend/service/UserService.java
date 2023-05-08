@@ -1,6 +1,8 @@
 package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -8,46 +10,66 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.domain.UserRole;
-import project.finalproject1backend.dto.ErrorDTO;
-import project.finalproject1backend.dto.PrincipalDTO;
-import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.ModifyRequestDTO;
+import project.finalproject1backend.dto.*;
 import project.finalproject1backend.dto.user.*;
 import project.finalproject1backend.jwt.JwtTokenProvider;
+import project.finalproject1backend.repository.AttachmentFileRepository;
 import project.finalproject1backend.repository.UserRepository;
+import project.finalproject1backend.util.UploadUtil;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final AttachmentFileRepository attachmentFileRepository;
+    private final UploadUtil uploadUtil;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO){
+//    private String path = "C:\\upload";  //로컬 테스트용
+    private String path = "/home/ubuntu/FinalProject/upload/users";  // 배포용
+
+    public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO, List<MultipartFile> businessLicense){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
             throw new IllegalArgumentException("existId");
-//            return new ResponseEntity<>(new ErrorDTO("400","existId"), HttpStatus.BAD_REQUEST);
+//            return new ResponseEntity<>(new ErrorDTO  ("400","existId"), HttpStatus.BAD_REQUEST);
         }
         Set<UserRole> roles = new HashSet<>();
         roles.add(UserRole.ROLE_STANDBY);
         User user = User.builder()
                 .userId(requestDTO.getUserId())
                 .password(passwordEncoder.encode(requestDTO.getPassword()))
+                .companyName(requestDTO.getCompanyName())
                 .ownerName(requestDTO.getOwnerName())
                 .corporateNumber(requestDTO.getCorporateNumber())
                 .openingDate(requestDTO.getOpeningDate())
-                .businessLicense(requestDTO.getBusinessLicense())
                 .managerName(requestDTO.getManagerName())
                 .email(requestDTO.getEmail())
                 .phoneNumber(requestDTO.getPhoneNumber())
                 .role(roles)
                 .build();
         userRepository.save(user);
+        if(!(businessLicense==null || businessLicense.isEmpty())){
+            for (MultipartFile i: businessLicense){
+                UploadDTO u = uploadUtil.upload(i,path);
+                AttachmentFile attachmentFile = AttachmentFile.builder()
+                        .fileName(u.getFileName())
+                        .filePath(path)
+                        .originalFileName(u.getOriginalName())
+                        .userBusinessLicense(user)
+                        .build();
+                attachmentFileRepository.save(attachmentFile);
+            }
+        }
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
@@ -75,7 +97,7 @@ public class UserService {
             throw new IllegalArgumentException("checkContent");
 //            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
         }
-        String[] contents = {"password","phoneNumber","managerName","email"};
+        String[] contents = {"password","phoneNumber","managerName","email","companyName"};
         int count =0;
         for (String s:contents) {
             if(s.equals(modifyRequestDTO.content)){
@@ -100,12 +122,16 @@ public class UserService {
             case "email":
                 user.get().setEmail(modifyRequestDTO.value);
                 break;
+            case "companyName":
+                user.get().setCompanyName(modifyRequestDTO.value);
+                break;
         }
         userRepository.save(user.get());
         return new ResponseEntity<>(modifyRequestDTO, HttpStatus.OK);
     }
 
-    public ResponseEntity<?> modifyLicense(PrincipalDTO principal, UserModifyLicenseRequestDTO modifyRequestDTO) {
+
+    public ResponseEntity<?> modifyLicense(PrincipalDTO principal, UserModifyLicenseRequestDTO modifyRequestDTO,List<MultipartFile> businessLicense) {
         if(!modifyRequestDTO.nullCheck()){
             throw new IllegalArgumentException("checkNull");
 //            return new ResponseEntity<>(new ErrorDTO("400","checkNull"), HttpStatus.BAD_REQUEST);
@@ -114,21 +140,44 @@ public class UserService {
         user.get().setOwnerName(modifyRequestDTO.getOwnerName());
         user.get().setOpeningDate(modifyRequestDTO.getOpeningDate());
         user.get().setCorporateNumber(modifyRequestDTO.getCorporateNumber());
-        user.get().setBusinessLicense(modifyRequestDTO.getBusinessLicense());
         userRepository.save(user.get());
+        if(!(businessLicense==null || businessLicense.isEmpty())){
+            if(!(user.get().getBusinessLicense()==null || user.get().getBusinessLicense().isEmpty())) {
+                //업로드 파일이 있을시 저장된 파일 삭제 / 업로드할 파일 등록
+                for (AttachmentFile a : user.get().getBusinessLicense()) {
+                    uploadUtil.deleteFile(a.getFileName(), path);
+                    //getA().getListOfB.remove(getA().getListOfB().get(someIndex));
+//                    user.get().getBusinessLicense().remove(a);
+                    a.setUserBusinessLicense(null);
+                    attachmentFileRepository.save(a);
+                    attachmentFileRepository.delete(a);
+                }
+//                attachmentFileRepository.deleteAllByUserBusinessLicense(user.get().getId());
+            }for (MultipartFile i: businessLicense){
+                UploadDTO u = uploadUtil.upload(i,path);
+                AttachmentFile attachmentFile = AttachmentFile.builder()
+                        .fileName(u.getFileName())
+                        .filePath(path)
+                        .originalFileName(u.getOriginalName())
+                        .userBusinessLicense(user.get())
+                        .build();
+                attachmentFileRepository.save(attachmentFile);
+            }
+        }
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUsers(Pageable pageable) {
         // list로 주기
-        List<UserInfoResponseDTO> userList = userRepository.findAll().stream().map(user1 -> UserInfoResponseDTO.from(user1)).toList();
+        List<UserInfoResponseDTO> userList = userRepository.findAll().stream().map(UserInfoResponseDTO::new).toList();
         // page로 주기
-        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
+//        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
+        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
         return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
-        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::from), HttpStatus.OK);
+        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);
     }
     public ResponseEntity<?> roleUser(String userId){
         Set<UserRole> roleUser = new HashSet<>();
@@ -145,5 +194,20 @@ public class UserService {
         user.get().setRole(roleStandby);
         userRepository.save(user.get());
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+    public ResponseEntity<?> roleRefuse(String userId){
+        Set<UserRole> roleRefuse = new HashSet<>();
+        roleRefuse.add(UserRole.ROLE_REFUSE);
+        Optional<User> user = userRepository.findByUserId(userId);
+        user.get().setRole(roleRefuse);
+        userRepository.save(user.get());
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getUserCount() {
+        int standbyCount=userRepository.findByRole(UserRole.ROLE_STANDBY).size();;
+        int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();;
+        int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();;
+        return new ResponseEntity<>(new UserCountResponseDTO(standbyCount,userCount,refuseCount),HttpStatus.OK);
     }
 }

@@ -41,6 +41,7 @@ public class CustomUserDetailService implements UserDetailsService {
                 .id(user.getId())
                 .password(user.getPassword())
                 .userId(user.getUserId())
+                .companyName(user.getCompanyName())
                 .ownerName(user.getOwnerName())
                 .corporateNumber(user.getCorporateNumber())
                 .openingDate(user.getOpeningDate())
