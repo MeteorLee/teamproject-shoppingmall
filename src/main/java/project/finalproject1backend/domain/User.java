@@ -1,5 +1,7 @@
 package project.finalproject1backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -15,8 +17,8 @@ import java.util.*;
 @Builder
 @Where(clause = "is_deleted = false")
 @SQLDelete(sql = "UPDATE user SET is_deleted = true, deleted_at=now() WHERE id = ?")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class User extends AuditingFields{
     @Id
@@ -33,6 +35,10 @@ public class User extends AuditingFields{
     //사업자 관련
     @Setter
     @Convert(converter = Encrypt256.class)
+    private String companyName;
+
+    @Setter
+    @Convert(converter = Encrypt256.class)
     private String ownerName;
 
     @Setter
@@ -41,10 +47,11 @@ public class User extends AuditingFields{
     @Setter
     @Convert(converter = Encrypt256.class)
     private String corporateNumber;
-
-    @Setter
-    @Convert(converter = Encrypt256.class)
-    private String businessLicense;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "userBusinessLicense", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @Builder.Default
+    private List<AttachmentFile> businessLicense = new ArrayList<>();
 
     //담당자관련
     @Setter

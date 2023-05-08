@@ -1,15 +1,14 @@
 package project.finalproject1backend.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSignUpRequestDTO {
@@ -17,13 +16,13 @@ public class UserSignUpRequestDTO {
     private String userId;
     @Schema(defaultValue = "123456789")
     private String password;
+    @Schema(defaultValue = "000회사")
+    private String companyName;
     @Schema(defaultValue = "김대표")
     private String ownerName;
     private LocalDate openingDate;
     @Schema(defaultValue = "corporateNumber")
     private String corporateNumber;
-    @Schema(defaultValue = "businessLicense")
-    private String businessLicense;
     @Schema(defaultValue = "강사원")
     private String managerName;
     @Schema(defaultValue = "010-4321-1234")
@@ -34,14 +33,13 @@ public class UserSignUpRequestDTO {
 /*
 {
 ”userId”:”id”
-”password”:”password”
-”owner_name”:”대표자이름”
-”opening_date”:”개업일시”
-”corporate_number”:”사업자등록번호”
-”businessLicense”:”businessLicense”
-”manager_name”:”manager_name”
-”phone_number”:”phone_number”
+”managerName”:”managerName”
+”phoneNumber”:”phoneNumber”
 ”email”:”email”
-”role”
+”password”:”password”
+”conpanyName”:”conpany_name”
+”ownerName”:”대표자이름”
+”openingDate”:”개업일시”
+”corporateNumber”:”사업자등록번호”
 }
  */
