@@ -112,14 +112,16 @@ public class UserController {
 
 
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
-    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.",
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.select : “업체명”,”ROLE_REFUSE “ROLE_USER”,”ROLE_STANDBY, “담당자명”",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersGetResponseDTO.class))),
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
     })
     @GetMapping("/account/admin/users")
-    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return userService.getUsers(pageable);
+//    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam String select,@RequestParam String value) {
+    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
+//        return userService.getUsers(pageable,select,value);
+        return userService.getUsers(select,value);
     }
 
 
@@ -129,7 +131,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
     })
-    @GetMapping("/account/admin/users/{userId}")
+    @GetMapping("/account/admin/usersInfo/{userId}")
     public ResponseEntity<?> getUserInfo(@PathVariable String userId) {
         return userService.getUserInfo(userId);
     }

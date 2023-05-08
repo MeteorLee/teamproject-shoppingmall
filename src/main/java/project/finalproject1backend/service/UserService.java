@@ -167,13 +167,31 @@ public class UserService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getUsers(Pageable pageable) {
+//    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
+    public ResponseEntity<?> getUsers(String select,String value) {
         // list로 주기
-        List<UserInfoResponseDTO> userList = userRepository.findAll().stream().map(UserInfoResponseDTO::new).toList();
+        List<UsersInfoDTO> userList ;
+        if(select==null){
+            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("ROLE_USER")){
+            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("ROLE_STANDBY")){
+            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("ROLE_REFUSE")){
+            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("업체명")){
+            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("담당자명")){
+            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+        }else {
+            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+        }
+
+        return new ResponseEntity<>(userList,HttpStatus.OK);
         // page로 주기
 //        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
-        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
-        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
+//        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
+//        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
