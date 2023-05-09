@@ -44,6 +44,9 @@ dependencies {
 
     //썸네일
     implementation 'net.coobird:thumbnailator:0.4.19'
+    //이메일
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 
 }
 

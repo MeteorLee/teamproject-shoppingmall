@@ -91,6 +91,9 @@ public class User extends AuditingFields{
     @Builder.Default
     private Boolean isDeleted = Boolean.FALSE;
 
+    @Setter
+    private String token;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
