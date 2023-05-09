@@ -53,7 +53,8 @@ public class CustomUserDetailService implements UserDetailsService {
                 .modifiedAt(user.getModifiedAt())
                 .createdAt(user.getCreatedAt())
                 .orders(user.getOrders())
-                .inquiries(user.getInquiries())
+                .buyInquiry(user.getBuyInquiry())
+                .saleInquiry(user.getSaleInquiry())
                 .authorities(grantedAuthorities)
                 .build();
 

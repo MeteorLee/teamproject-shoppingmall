@@ -3,9 +3,9 @@ package project.finalproject1backend.dto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
-import project.finalproject1backend.domain.Inquiry;
+import project.finalproject1backend.domain.Inquiry.BuyInquiry;
+import project.finalproject1backend.domain.Inquiry.SaleInquiry;
 import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.domain.UserRole;
 
@@ -29,7 +29,8 @@ public class PrincipalDTO implements UserDetails {
     private String email;
     private String phoneNumber;
     private List<Orders> orders;
-    private List<Inquiry> inquiries;
+    private List<BuyInquiry> buyInquiry;
+    private List<SaleInquiry> saleInquiry;
     private Set<UserRole> role ;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

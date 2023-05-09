@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import project.finalproject1backend.domain.Inquiry.BuyInquiry;
+import project.finalproject1backend.domain.Inquiry.SaleInquiry;
 import project.finalproject1backend.util.Encrypt256;
 
 import javax.persistence.*;
@@ -73,10 +75,15 @@ public class User extends AuditingFields{
     private List<Orders> orders = new ArrayList<>();
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
 
-    @OneToMany(mappedBy = "inquiryUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Inquiry> inquiries = new ArrayList<>();
+    private List<BuyInquiry> buyInquiry = new ArrayList<>();
+
+    @OneToMany(mappedBy = "saleInquiryId", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @Builder.Default
+    private List<SaleInquiry> saleInquiry = new ArrayList<>();
 
     @Setter
     @Enumerated(EnumType.STRING)
