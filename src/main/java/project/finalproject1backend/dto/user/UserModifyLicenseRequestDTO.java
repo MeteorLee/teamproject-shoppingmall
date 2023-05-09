@@ -13,22 +13,23 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserModifyLicenseRequestDTO {
+    @Schema(defaultValue = "~~기업")
+    private String companyName;
     @Schema(defaultValue = "서대표")
     private String ownerName;
     private LocalDate openingDate;
     @Schema(defaultValue = "corporateNumber")
     private String corporateNumber;
-    @Schema(defaultValue = "businessLicense")
-    private String businessLicense;
+
 
     public boolean nullCheck(){
+        if(this.companyName==null)
+            return false;
         if(this.openingDate==null)
             return false;
         if(this.ownerName==null)
             return false;
         if(this.corporateNumber==null)
-            return false;
-        if(this.businessLicense==null)
             return false;
         return true;
     }

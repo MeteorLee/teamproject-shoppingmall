@@ -1,12 +1,10 @@
 package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +20,8 @@ import project.finalproject1backend.repository.AttachmentFileRepository;
 import project.finalproject1backend.repository.UserRepository;
 import project.finalproject1backend.util.UploadUtil;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.*;
 
 @Service
@@ -32,6 +32,8 @@ public class UserService {
     private final AttachmentFileRepository attachmentFileRepository;
     private final UploadUtil uploadUtil;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    private final JavaMailSender javaMailSender;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -167,13 +169,31 @@ public class UserService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getUsers(Pageable pageable) {
+//    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
+    public ResponseEntity<?> getUsers(String select,String value) {
         // list로 주기
-        List<UserInfoResponseDTO> userList = userRepository.findAll().stream().map(UserInfoResponseDTO::new).toList();
+        List<UsersInfoDTO> userList ;
+        if(select==null){
+            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("ROLE_USER")){
+            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("ROLE_STANDBY")){
+            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("ROLE_REFUSE")){
+            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("업체명")){
+            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+        }else if(select.equals("담당자명")){
+            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+        }else {
+            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+        }
+
+        return new ResponseEntity<>(userList,HttpStatus.OK);
         // page로 주기
 //        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
-        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
-        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
+//        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
+//        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
@@ -209,5 +229,178 @@ public class UserService {
         int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();;
         int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();;
         return new ResponseEntity<>(new UserCountResponseDTO(standbyCount,userCount,refuseCount),HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> booleanBusinessLicense(PrincipalDTO principal) {
+        Boolean result;
+        if(principal.getBusinessLicense().isEmpty()||principal.getBusinessLicense()==null) {
+            result = false;
+        }
+        else {result=true;
+        }
+        return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> sendEmail(String email) throws IllegalArgumentException {
+        //토큰 생성
+        String token = UUID.randomUUID().toString();
+        //email 에 해당되는 user에 토큰 값을 집어넣고
+        Optional<User> user = userRepository.findById(1L);
+        if(user.isEmpty()){
+            throw new IllegalArgumentException("checkEmail");
+        }
+        user.get().setToken(token);
+        userRepository.save(user.get());
+        //email 에 링크 전달
+        try{
+            MimeMessage mailMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
+            mimeMessageHelper.setText("http://52.78.88.121:8080/confirm?token="+token);
+            javaMailSender.send(mailMessage);
+        }catch (MessagingException e) {
+            throw new IllegalArgumentException("email 전송 실패");
+        }
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+        //링크 에 들어가면 receiverEmail 값과  token값을 받는다
+        //토큰값 검증후 맞으면 아이디값 전달 or 비밀번호 새로 설정
+
+    }
+
+    public ResponseEntity<?> confirm( String token) {
+        Optional<User> user = userRepository.findById(1L);
+        if(!user.get().getToken().equals(token)){
+            throw new IllegalArgumentException("잘못된 토큰값");
+        }
+        user.get().setToken(null);
+        userRepository.save(user.get());
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+
+    }
+
+    public ResponseEntity<?> findUserIdByManagerName(String email, String managerName) {
+        //토큰 생성
+        String token = UUID.randomUUID().toString();
+        //email 에 해당되는 user에 토큰 값을 집어넣고
+        List<User> user = userRepository.findByManagerName(managerName);
+        if(user==null ||user.isEmpty()){
+            throw new IllegalArgumentException("checkManagerName");
+        }
+        int count = 0;
+        for (User u:user) {
+            if(!(u.getEmail()==null)&& u.getEmail().equals(email)){
+                    u.setToken(token);
+                    userRepository.save(u);
+                    count++;
+            }
+        }
+        if(count==0){
+            throw new IllegalArgumentException("checkEmail");
+        }
+        //email 에 링크 전달
+        try{
+            MimeMessage mailMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
+            mimeMessageHelper.setText("http://52.78.88.121:8080/findUserIdByManagerName/confirm?managerName="+managerName+"&email="+email+"&token="+token);
+            javaMailSender.send(mailMessage);
+        }catch (MessagingException e) {
+            throw new IllegalArgumentException("email 전송 실패");
+        }
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> findUserIdByManagerNameConfirm(String managerName,String email, String token) {
+        //email 에 해당되는 user에 토큰 값을 집어넣고
+        List<User> user = userRepository.findByManagerName(managerName);
+        if(user==null ||user.isEmpty()){
+            throw new IllegalArgumentException("checkManagerName");
+        }
+        int count = 0;
+        List<String> userId = new ArrayList<>();
+        for (User u:user) {
+            if(!(u.getEmail()==null)&& u.getEmail().equals(email)){
+                if(u.getToken().equals(token)){
+                    userId.add(u.getUserId());
+                    u.setToken(null);
+                    userRepository.save(u);
+                    count++;
+                }
+            }
+        }
+        if(count==0){
+            throw new IllegalArgumentException("checkEmail");
+        }
+        try{
+            MimeMessage mailMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject("bizcuratorproject.shop 아이디찾기");
+            mimeMessageHelper.setText("bizcuratorproject.shop 에 "+userId+" 아이디로 가입되어 있습니다.");
+            javaMailSender.send(mailMessage);
+        }catch (MessagingException e) {
+            throw new IllegalArgumentException("email 전송 실패");
+        }
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> setRandomPassword(String email, String userId) {
+        //토큰 생성
+        String token = UUID.randomUUID().toString();
+        //email 에 해당되는 user에 토큰 값을 집어넣고
+        Optional<User>user = userRepository.findByUserId(userId);
+        if(user.get()==null ||user.isEmpty()){
+            throw new IllegalArgumentException("userId");
+        }
+        if(user.get().getEmail()==null||!(user.get().getEmail().equals(email))){
+            throw new IllegalArgumentException("checkEmail");
+
+        }
+        user.get().setToken(token);
+        userRepository.save(user.get());
+        //email 에 링크 전달
+        try{
+            MimeMessage mailMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
+            mimeMessageHelper.setText("http://52.78.88.121:8080/setRandomPassword/confirm?userId="+userId+"&email="+email+"&token="+token);
+            javaMailSender.send(mailMessage);
+        }catch (MessagingException e) {
+            throw new IllegalArgumentException("email 전송 실패");
+        }
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> setRandomPasswordConfirm(String userId, String email, String token) {
+        Optional<User>user = userRepository.findByUserId(userId);
+        if(user.get()==null ||user.isEmpty()){
+            throw new IllegalArgumentException("userId");
+        }
+        if(user.get().getEmail()==null||!(user.get().getEmail().equals(email))){
+            throw new IllegalArgumentException("checkEmail");
+
+        }
+        if(user.get().getToken()==null||!user.get().getToken().equals(token)){
+            throw new IllegalArgumentException("tokenError");
+        }
+        String newPassword = UUID.randomUUID().toString().substring(1,8);
+        user.get().setPassword(passwordEncoder.encode(newPassword));
+        user.get().setToken(null);
+        userRepository.save(user.get());
+        //email 에 링크 전달
+        try{
+            MimeMessage mailMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject("bizcuratorproject.shop 비밀번호 초기화");
+            mimeMessageHelper.setText("bizcuratorproject.shop 에 "+userId+" 아이디로 가입되어 있고, 새로운 비밀번호는 "+newPassword+" 입니다.");
+            javaMailSender.send(mailMessage);
+        }catch (MessagingException e) {
+            throw new IllegalArgumentException("email 전송 실패");
+        }
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 }

@@ -9,9 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +32,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
     @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
     @Operation(summary = "회원가입 메서드", description = "회원가입 메서드입니다.")
     @ApiResponses(value = {
@@ -71,6 +69,73 @@ public class UserController {
     public ResponseEntity<?> delete(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
         return userService.delete(principal);
     }
+
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "이메일 전송 메서드", description = "이메일 전송 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/sendEmail")
+    public ResponseEntity<?> sendEmail(@RequestParam String email) {
+        return userService.sendEmail(email);
+    }
+
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "인증 메서드", description = "인증 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/confirm")
+    public ResponseEntity<?> confirm( @RequestParam String token) {
+        return userService.confirm(token);
+    }
+
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "담당자 이름과 이메일로 id 찾기 메서드", description = "담당자 이름과 이메일로 id 찾기 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/findUserIdByManagerName")
+    public ResponseEntity<?> findUserIdByManagerName(@RequestParam String email,@RequestParam String managerName) {
+        return userService.findUserIdByManagerName(email,managerName);
+    }
+
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "managerName , email로 인증 및 기존 userId 이메일로 알려주기", description = "managerName , email로 인증 및 기존 userId 이메일로 알려주기 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/findUserIdByManagerName/confirm")
+    public ResponseEntity<?> findUserIdByManagerNameConfirm(@RequestParam String email,@RequestParam String managerName, @RequestParam String token) {
+        return userService.findUserIdByManagerNameConfirm(managerName,email,token);
+    }
+
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "임시 비밀번호로 생성 인증 메서드", description = "임시 비밀번호로 생성 인증 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/setRandomPassword")
+    public ResponseEntity<?> setRandomPassword(@RequestParam String email,@RequestParam String userId) {
+        return userService.setRandomPassword(email,userId);
+    }
+
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "임시로 비밀번호 생성 이메일로 알려주기", description = "임시로 비밀번호 생성 이메일로 알려주기 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/setRandomPassword/confirm")
+    public ResponseEntity<?> setRandomPasswordConfirm(@RequestParam String email,@RequestParam String userId, @RequestParam String token) {
+        return userService.setRandomPasswordConfirm(userId,email,token);
+    }
+
 
 
     @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
@@ -109,17 +174,29 @@ public class UserController {
     public ResponseEntity<?> modifyLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal, @RequestPart(value = "requestDTO") UserModifyLicenseRequestDTO modifyRequestDTO,@RequestPart(required = false) List<MultipartFile> businessLicense) {
         return userService.modifyLicense(principal,modifyRequestDTO,businessLicense);
     }
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(사업자등록 첨부여부 확인)", description = "마이 페이지(사업자등록 첨부여부 확인) 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Boolean.class)))
+    })
+    @PostMapping(value = "/account/businessLicense")
+    public ResponseEntity<?> booleanBusinessLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal) {
+        return userService.booleanBusinessLicense(principal);
+    }
 
 
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
-    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.",
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.select : “업체명”,”ROLE_REFUSE “ROLE_USER”,”ROLE_STANDBY, “담당자명”",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersGetResponseDTO.class))),
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
     })
     @GetMapping("/account/admin/users")
-    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return userService.getUsers(pageable);
+//    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam String select,@RequestParam String value) {
+    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
+//        return userService.getUsers(pageable,select,value);
+        return userService.getUsers(select,value);
     }
 
 
@@ -129,7 +206,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
     })
-    @GetMapping("/account/admin/users/{userId}")
+    @GetMapping("/account/admin/usersInfo/{userId}")
     public ResponseEntity<?> getUserInfo(@PathVariable String userId) {
         return userService.getUserInfo(userId);
     }
