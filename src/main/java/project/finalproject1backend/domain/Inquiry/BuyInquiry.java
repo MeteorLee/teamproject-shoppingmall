@@ -3,6 +3,7 @@ package project.finalproject1backend.domain.Inquiry;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import project.finalproject1backend.domain.Product;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.util.Encrypt256;
 
@@ -25,6 +26,9 @@ public class BuyInquiry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User buyInquiryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product buyInquiryProduct;
 
     @Setter
     @Convert(converter = Encrypt256.class)

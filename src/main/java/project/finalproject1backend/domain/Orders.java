@@ -9,4 +9,6 @@ public class Orders {
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     private User orderUser;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product orderProduct;
 }
