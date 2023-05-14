@@ -6,8 +6,8 @@ import org.hibernate.annotations.Where;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
 import project.finalproject1backend.domain.constant.Delivery;
 import project.finalproject1backend.domain.constant.MainCategory;
-import project.finalproject1backend.domain.constant.Status;
-import project.finalproject1backend.domain.constant.SubCategory;
+import project.finalproject1backend.domain.constant.ProductStatus;
+import project.finalproject1backend.dto.product.ProductFormDto;
 import project.finalproject1backend.exception.OutOfStockException;
 
 import javax.persistence.*;
@@ -48,6 +48,7 @@ public class Product extends AuditingFields{
 
     @Setter
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Delivery delivery;    //배송방법
 
     @Setter
@@ -62,28 +63,36 @@ public class Product extends AuditingFields{
     private int minimumQuantity;     //최소수량
 
     @Setter
-    private Status status;  //판매상태
+    @Enumerated(EnumType.STRING)
+    private ProductStatus productStatus;  //판매상태
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     @Setter
-    private MainCategory maincategory;  //대분류
+    private MainCategory mainCategory;  //대분류
 
     @Setter
     private String message;  //상품설명
-
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     private SubCategory productSubcategory;  //중분류
 
     //유저의 현황 관련
-    @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cartProduct", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Orders> orders = new ArrayList<>();
+    private List<Cart> carts = new ArrayList<>();
 
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
     @OneToMany(mappedBy = "buyInquiryProduct", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<BuyInquiry> inquiries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "productAttachment", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @Builder.Default
+    private List<AttachmentFile> imgList = new ArrayList<>();
 
 
     @Override
@@ -99,22 +108,22 @@ public class Product extends AuditingFields{
         return Objects.hash(id);
     }
 
-//    public void updateProduct(ProductFormDto productFormDto){
-//        this.productName = productFormDto.getProductName();
-//        this.consumerPrice = productFormDto.getConsumerPrice();
-//        this.productPrice = productFormDto.getProductPrice();
-//        this.manufacturer = productFormDto.getManufacturer();
-//        this.status = productFormDto.getStatus();
-//        this.minimumQuantity = productFormDto.getMinimumQuantity();
-//        this.delivery = productFormDto.getDelivery();
-//        this.stockNumber = productFormDto.getStockNumber();
-//        this.deliveryCharge = productFormDto.getDeliveryCharge();
-//        this.minimumQuantity = productFormDto.getMinimumQuantity();
-//        this.maincategory = productFormDto.getMaincategory();
-//        this.subcategory = productFormDto.getSubcategory();
-//        this.message = productFormDto.getMessage();
-//
-//    }
+    public void updateProduct(ProductFormDto productFormDto){
+        this.productName = productFormDto.getProductName();
+        this.consumerPrice = productFormDto.getConsumerPrice();
+        this.productPrice = productFormDto.getProductPrice();
+        this.manufacturer = productFormDto.getManufacturer();
+        this.productStatus = productFormDto.getProductStatus();
+        this.minimumQuantity = productFormDto.getMinimumQuantity();
+        this.delivery = productFormDto.getDelivery();
+        this.stockNumber = productFormDto.getStockNumber();
+        this.deliveryCharge = productFormDto.getDeliveryCharge();
+        this.minimumQuantity = productFormDto.getMinimumQuantity();
+        this.mainCategory = productFormDto.getMaincategory();
+//        this.productSubcategory = productFormDto.getSubcategory();
+        this.message = productFormDto.getMessage();
+
+    }
 
 
     public void removeStock(int stockNumber){ //재고 수량 감소
