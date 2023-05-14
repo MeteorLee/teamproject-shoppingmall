@@ -65,7 +65,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    @PostMapping("/account/admin/product/getSubCategory")
+    @GetMapping("/account/admin/product/getSubCategory")
     public ResponseEntity<?> getSubCategory(@RequestParam MainCategory mainCategory){
         return productService.getSubCategory(mainCategory);
     }
@@ -86,78 +86,78 @@ public class ProductController {
     }
 
 
-    @Tag(name = "API 상품", description = "상품/수정 api 입니다.")
-    @Operation(summary = "상품수정 메서드", description = "상품수정 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.class))),
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    // 상품수정
-    @PostMapping("/account/admin/product/{productId}")
-    public ResponseEntity<?> modify(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal,
-                                           @PathVariable("productId") Long productId,
-                                           @RequestBody ProductFormDto productDto,
-                                           @RequestParam("productImgFile") List<MultipartFile> itemImgFileList) throws Exception {
-//        return productService.modify(principal,productId, productDto, itemImgFileList);
-        return null;
-    }
-
-    @Tag(name = "API 상품", description = "상품/삭제 api 입니다.")
-    @Operation(summary = "상품삭제 메서드", description = "상품삭제 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    @PostMapping("/account/products/{productId}/delete")
-    public ResponseEntity<?> delete(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal,
-                                    @PathVariable("productId") Long productId) {
-//        return productService.delete(principal,productId);
-        return null;
-    }
-
-
-
-    @Tag(name = "API 상품전체조회", description = "상품전체조회 api 입니다.")
-    @Operation(summary = "상품전체조회 메서드", description = "상품전체조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.class))),
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    @GetMapping("/account/products")
-    public ResponseEntity<List<ProductFormDto>> getAllProducts() {
-//        return productService.getAllProducts();
-        return null;
-    }
-
-    @Tag(name = "API 상품카테고리별조회", description = "상풍카테고리별조회 api 입니다.")
-    @Operation(summary = "상품카테고리별조회 메서드", description = "상품카테고리별조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    @GetMapping("/account/products/category")
-    public ResponseEntity<List<Product>> getProductsByCategory(@RequestParam("mainCategory") MainCategory mainCategory,
-                                                               @RequestParam("subCategory") String subCategory) {
-//        return productService.getProductsByCategory(mainCategory, subCategory);
-        return null;
-    }
-
-    @Tag(name = "API 상품랜덤5개조회", description = "상품랜덤5개조회 api 입니다.")
-    @Operation(summary = "상품랜덤5개조회 메서드", description = "상품랜덤5개조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    @GetMapping(params = "/account/products/random")
-    public ResponseEntity<List<Product>> getProductByRandom(@RequestParam("subCategory") String subCategory) {
-
-//        return productService.getProductByRandom(subCategory);
-        return null;
-    }
-
-    @GetMapping(params = "/account/product/{productId}")
-    public ResponseEntity<?> getProduct(@PathVariable("productId") Long productId, Model model) {
-//        return productService.getProduct(productId);
-        return null;
-    }
+//    @Tag(name = "API 상품", description = "상품/수정 api 입니다.")
+//    @Operation(summary = "상품수정 메서드", description = "상품수정 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.class))),
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    // 상품수정
+//    @PostMapping("/account/admin/product/{productId}")
+//    public ResponseEntity<?> modify(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal,
+//                                           @PathVariable("productId") Long productId,
+//                                           @RequestBody ProductFormDto productDto,
+//                                           @RequestParam("productImgFile") List<MultipartFile> itemImgFileList) throws Exception {
+////        return productService.modify(principal,productId, productDto, itemImgFileList);
+//        return null;
+//    }
+//
+//    @Tag(name = "API 상품", description = "상품/삭제 api 입니다.")
+//    @Operation(summary = "상품삭제 메서드", description = "상품삭제 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    @PostMapping("/account/products/{productId}/delete")
+//    public ResponseEntity<?> delete(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal,
+//                                    @PathVariable("productId") Long productId) {
+////        return productService.delete(principal,productId);
+//        return null;
+//    }
+//
+//
+//
+//    @Tag(name = "API 상품전체조회", description = "상품전체조회 api 입니다.")
+//    @Operation(summary = "상품전체조회 메서드", description = "상품전체조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.class))),
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    @GetMapping("/account/products")
+//    public ResponseEntity<List<ProductFormDto>> getAllProducts() {
+////        return productService.getAllProducts();
+//        return null;
+//    }
+//
+//    @Tag(name = "API 상품카테고리별조회", description = "상풍카테고리별조회 api 입니다.")
+//    @Operation(summary = "상품카테고리별조회 메서드", description = "상품카테고리별조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    @GetMapping("/account/products/category")
+//    public ResponseEntity<List<Product>> getProductsByCategory(@RequestParam("mainCategory") MainCategory mainCategory,
+//                                                               @RequestParam("subCategory") String subCategory) {
+////        return productService.getProductsByCategory(mainCategory, subCategory);
+//        return null;
+//    }
+//
+//    @Tag(name = "API 상품랜덤5개조회", description = "상품랜덤5개조회 api 입니다.")
+//    @Operation(summary = "상품랜덤5개조회 메서드", description = "상품랜덤5개조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+//    })
+//    @GetMapping(params = "/account/products/random")
+//    public ResponseEntity<List<Product>> getProductByRandom(@RequestParam("subCategory") String subCategory) {
+//
+////        return productService.getProductByRandom(subCategory);
+//        return null;
+//    }
+//
+//    @GetMapping(params = "/account/product/{productId}")
+//    public ResponseEntity<?> getProduct(@PathVariable("productId") Long productId, Model model) {
+////        return productService.getProduct(productId);
+//        return null;
+//    }
 
 
 }
