@@ -34,8 +34,8 @@ public class ProductService {
 //    private final ProductImgRepository productImgRepository;
     private final UploadUtil uploadUtil;
 
-    private String path = "C:\\upload";  //로컬 테스트용
-//    private String path = "/home/ubuntu/FinalProject/upload/product";  // 배포용
+//    private String path = "C:\\upload";  //로컬 테스트용
+    private String path = "/home/ubuntu/FinalProject/upload/product";  // 배포용
     public ResponseEntity<?> createSubCategory(SubCategoryRequestDTO requestDTO){
         String[] subcategoryList = requestDTO.getSubCategoryName().split(",");
         for (String s: subcategoryList) {
