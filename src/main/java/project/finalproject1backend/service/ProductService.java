@@ -7,15 +7,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.*;
+import project.finalproject1backend.domain.constant.MainCategory;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
 import project.finalproject1backend.dto.product.ProductFormDto;
 import project.finalproject1backend.dto.subCategory.SubCategoryRequestDTO;
+import project.finalproject1backend.dto.subCategory.SubCategoryResponseDTO;
 import project.finalproject1backend.repository.*;
 import project.finalproject1backend.util.UploadUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,14 +37,29 @@ public class ProductService {
     private String path = "C:\\upload";  //로컬 테스트용
 //    private String path = "/home/ubuntu/FinalProject/upload/product";  // 배포용
     public ResponseEntity<?> createSubCategory(SubCategoryRequestDTO requestDTO){
-        SubCategory subCategory = SubCategory.builder()
-                .mainCategory(requestDTO.getMainCategory())
-                .name(requestDTO.getSubCategoryName())
-                .build();
-        subCategoryRepository.save(subCategory);
+        String[] subcategoryList = requestDTO.getSubCategoryName().split(",");
+        for (String s: subcategoryList) {
+            if(!subCategoryRepository.findByName(s).isPresent()) {
+                SubCategory subCategory = SubCategory.builder()
+                        .mainCategory(requestDTO.getMainCategory())
+                        .name(s)
+                        .build();
+                subCategoryRepository.save(subCategory);
+            }
+        }
+
         return new ResponseEntity<>(new ResponseDTO("200","success"),HttpStatus.OK);
     }
 
+    public ResponseEntity<?> getSubCategory(MainCategory mainCategory) {
+        List<SubCategory> subCategories = subCategoryRepository.findAllByMainCategory(mainCategory);
+        List<String> result = new ArrayList<>();
+        for (SubCategory s:subCategories) {
+            result.add(s.getName());
+        }
+        return new ResponseEntity<>(new SubCategoryResponseDTO(result.toString().replace("["," ").replace("]"," ").strip()),HttpStatus.OK);
+
+    }
     public ResponseEntity<?> createProduct(PrincipalDTO principal, ProductFormDto productDto, List<MultipartFile> productImgFileList) throws Exception {
         Optional<User> user=userRepository.findById(principal.getId());
         if(!user.isPresent()){
