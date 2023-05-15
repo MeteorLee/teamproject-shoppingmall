@@ -69,10 +69,10 @@ public class User extends AuditingFields{
     private String phoneNumber;
 
     //유저의 현황 관련
-    @OneToMany(mappedBy = "orderUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cartUser", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Orders> orders = new ArrayList<>();
+    private List<Cart> carts = new ArrayList<>();
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
 
     @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL)

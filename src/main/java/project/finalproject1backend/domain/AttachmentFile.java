@@ -21,6 +21,8 @@ public class AttachmentFile {
     @Setter
     public String originalFileName;
     @Setter
+    public String thumbFileName;
+    @Setter
     public String filePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,6 +31,10 @@ public class AttachmentFile {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     public User userBusinessLicense;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    public Product productAttachment;
 
 }
 /*
