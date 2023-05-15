@@ -41,10 +41,13 @@ public class ProductController {
     @Tag(name = "관리자 페이지 (상품관련)", description = "관리자 페이지 (상품관련)")
     @Operation(summary = "서브카테고리 생성 메서드", description = "등록되어 있는 MainCategory GUEST_ROOM_SUPPLIES(\"객실용품\"),\n" +
             "    BATHROOM_SUPPLIES(\"욕실용품\"),\n" +
+            "    BEVERAGE(\"식음료\"),\n" +
             "    HYGIENE_SUPPLIES(\"위생용품\"),\n" +
             "    BEDDING(\"침구류\"),\n" +
+            "    SAFETY_EQUIPMENT(\"소방/안전설비\"),\n" +
             "    ELECTRONIC_APPLIANCES(\"전자제품\"),\n" +
-            "    CLEANING_FACILITY_MANAGEMENT(\"청소/시설관리\");",security ={ @SecurityRequirement(name = "bearer-key") })
+            "    CLEANING_FACILITY_MANAGEMENT(\"청소/시설관리\"),\n" +
+            "    OFFICE_SUPPLIES(\"사무용품\")",security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
