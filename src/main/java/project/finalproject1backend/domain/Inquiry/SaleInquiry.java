@@ -3,12 +3,14 @@ package project.finalproject1backend.domain.Inquiry;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.util.Encrypt256;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @ToString
@@ -20,7 +22,6 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class SaleInquiry {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,36 +31,37 @@ public class SaleInquiry {
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String category;
+    private String company;
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String product;
-
-    @Setter
-    private int amount;
+    private String companyAddress;
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String attachment;
+    private String address;
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String answerAttachment;
+    private String detailsAddress;
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String content;
+    private String manufacturer;
 
     @Setter
-    private LocalDate estimateWishDate;
-
-    @Setter
-    private LocalDate deliveryWishDate;
+    @Builder.Default
+    private boolean mall = Boolean.FALSE;
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String managerNumber;
+    private String mallAddress;
+
+    @Setter
+    @OneToMany(mappedBy = "saleAttachment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @Builder.Default
+    private List<AttachmentFile> saleAttachmentList = new ArrayList<>();
 
     @Setter
     @Enumerated(EnumType.STRING)
