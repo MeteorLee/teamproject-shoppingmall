@@ -23,6 +23,7 @@ import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.product.ProductFormDto;
 import project.finalproject1backend.dto.subCategory.SubCategoryRequestDTO;
+import project.finalproject1backend.dto.subCategory.SubCategoryResponseDTO;
 import project.finalproject1backend.service.ProductService;
 
 
@@ -62,7 +63,7 @@ public class ProductController {
             "    ELECTRONIC_APPLIANCES(\"전자제품\"),\n" +
             "    CLEANING_FACILITY_MANAGEMENT(\"청소/시설관리\");",security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = SubCategoryResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @GetMapping("/account/admin/product/getSubCategory")
