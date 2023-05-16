@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +46,15 @@ public class UserController {
     public ResponseEntity<?> signUp(@RequestPart(value = "requestDTO") @Valid UserSignUpRequestDTO requestDTO,
                                               BindingResult bindingResult,@RequestPart(required = false) List<MultipartFile> businessLicense) {
         return userService.signUp(requestDTO,businessLicense);
+    }
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "중복 ID 체크 메서드", description = "중복 ID 체크 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Boolean.class)))
+    })
+    @GetMapping( "/signup/checkId")
+    public ResponseEntity<?> checkId(@RequestParam String userId) {
+        return userService.checkId(userId);
     }
 
 
@@ -87,9 +99,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    @GetMapping("/confirm")
-    public ResponseEntity<?> confirm( @RequestParam String token) {
-        return userService.confirm(token);
+    @GetMapping("/sendEmail/confirm")
+    public ResponseEntity<?> confirm(@RequestParam String email, @RequestParam String randomValue) {
+        return userService.confirm(email,randomValue);
     }
 
     @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
@@ -193,10 +205,15 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
     })
     @GetMapping("/account/admin/users")
-//    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam String select,@RequestParam String value) {
-    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
-//        return userService.getUsers(pageable,select,value);
-        return userService.getUsers(select,value);
+    public ResponseEntity<?> getUsers( @Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
+//    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
+        return userService.getUsers(pageable,select,value);
+//        return new ResponseEntity<>(pageable,HttpStatus.OK);
+//        return userService.getUsers(select,value);
     }
 
 

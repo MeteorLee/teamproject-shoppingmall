@@ -1,6 +1,8 @@
 package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,12 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
+import project.finalproject1backend.domain.Confirm;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.*;
 import project.finalproject1backend.dto.user.*;
 import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.AttachmentFileRepository;
+import project.finalproject1backend.repository.ConfirmRepository;
 import project.finalproject1backend.repository.UserRepository;
 import project.finalproject1backend.util.UploadUtil;
 
@@ -30,6 +34,7 @@ import java.util.*;
 public class UserService {
     private final UserRepository userRepository;
     private final AttachmentFileRepository attachmentFileRepository;
+    private final ConfirmRepository confirmRepository;
     private final UploadUtil uploadUtil;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -170,30 +175,37 @@ public class UserService {
     }
 
 //    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
-    public ResponseEntity<?> getUsers(String select,String value) {
+    public ResponseEntity<?> getUsers(Pageable pageable, String select, String value) {
         // list로 주기
-        List<UsersInfoDTO> userList ;
+        Page<UserInfoResponseDTO> userPage = null;
         if(select==null){
-            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+            userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("ROLE_USER")){
-            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByRole(UserRole.ROLE_USER,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("ROLE_STANDBY")){
-            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByRole(UserRole.ROLE_STANDBY,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("ROLE_REFUSE")){
-            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByRole(UserRole.ROLE_REFUSE,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("업체명")){
-            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByCompanyName(value,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("담당자명")){
-            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByManagerName(value,pageable).map(UserInfoResponseDTO::new);
         }else {
-            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+            userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
         }
 
-        return new ResponseEntity<>(userList,HttpStatus.OK);
+//        return new ResponseEntity<>(userList,HttpStatus.OK);
         // page로 주기
 //        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
 //        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
-//        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
+        return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
@@ -225,9 +237,9 @@ public class UserService {
     }
 
     public ResponseEntity<?> getUserCount() {
-        int standbyCount=userRepository.findByRole(UserRole.ROLE_STANDBY).size();;
-        int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();;
-        int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();;
+        int standbyCount=userRepository.findByRole(UserRole.ROLE_STANDBY).size();
+        int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();
+        int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();
         return new ResponseEntity<>(new UserCountResponseDTO(standbyCount,userCount,refuseCount),HttpStatus.OK);
     }
 
@@ -243,38 +255,42 @@ public class UserService {
 
     public ResponseEntity<?> sendEmail(String email) throws IllegalArgumentException {
         //토큰 생성
-        String token = UUID.randomUUID().toString();
-        //email 에 해당되는 user에 토큰 값을 집어넣고
-        Optional<User> user = userRepository.findById(1L);
-        if(user.isEmpty()){
-            throw new IllegalArgumentException("checkEmail");
+        String token = UUID.randomUUID().toString().substring(1,7);
+        //기존의 email인증은 삭제하고 새로운 confirm에 email,토큰 값을 저장
+
+        Optional<Confirm> checkConfirm = confirmRepository.findByEmail(email);
+        if(checkConfirm.isPresent()){
+            confirmRepository.delete(checkConfirm.get());
         }
-        user.get().setToken(token);
-        userRepository.save(user.get());
-        //email 에 링크 전달
+        Confirm confirm = Confirm.builder()
+                .email(email)
+                .token(token)
+                .build();
+        confirmRepository.save(confirm);
+        //email 에 인증값 전달
         try{
             MimeMessage mailMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
-            mimeMessageHelper.setText("http://52.78.88.121:8080/confirm?token="+token);
+            mimeMessageHelper.setText("인증값은 "+token+" 입니다.");
             javaMailSender.send(mailMessage);
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
         }
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
-        //링크 에 들어가면 receiverEmail 값과  token값을 받는다
-        //토큰값 검증후 맞으면 아이디값 전달 or 비밀번호 새로 설정
 
     }
 
-    public ResponseEntity<?> confirm( String token) {
-        Optional<User> user = userRepository.findById(1L);
-        if(!user.get().getToken().equals(token)){
-            throw new IllegalArgumentException("잘못된 토큰값");
+    public ResponseEntity<?> confirm(String email , String randomValue) {
+        Optional<Confirm> confirm =confirmRepository.findByEmail(email);
+        if(!confirm.isPresent()){
+            throw new IllegalArgumentException("checkEmail");
         }
-        user.get().setToken(null);
-        userRepository.save(user.get());
+        if(!confirm.get().getToken().equals(randomValue)){
+            throw new IllegalArgumentException("checkRandomValue");
+        }
+        confirmRepository.delete(confirm.get());
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
 
     }
@@ -304,7 +320,7 @@ public class UserService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
-            mimeMessageHelper.setText("http://52.78.88.121:8080/findUserIdByManagerName/confirm?managerName="+managerName+"&email="+email+"&token="+token);
+            mimeMessageHelper.setText("https://bizcuratorproject.shop/findUserIdByManagerName/confirm?managerName="+managerName+"&email="+email+"&token="+token);
             javaMailSender.send(mailMessage);
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
@@ -343,7 +359,7 @@ public class UserService {
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
         }
-        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+        return new ResponseEntity<>("인증하신 email로 가입되어 있는 ID 안내 메일을 전송 했습니다. ", HttpStatus.OK);
     }
 
     public ResponseEntity<?> setRandomPassword(String email, String userId) {
@@ -366,7 +382,7 @@ public class UserService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
-            mimeMessageHelper.setText("http://52.78.88.121:8080/setRandomPassword/confirm?userId="+userId+"&email="+email+"&token="+token);
+            mimeMessageHelper.setText("https://bizcuratorproject.shop/setRandomPassword/confirm?userId="+userId+"&email="+email+"&token="+token);
             javaMailSender.send(mailMessage);
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
@@ -401,6 +417,10 @@ public class UserService {
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
         }
-        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+        return new ResponseEntity<>("인증하신 email로 ID와 Password 안내 메일을 전송 했습니다. ", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> checkId(String userId) {
+        return new ResponseEntity<>(userRepository.existsByUserId(userId),HttpStatus.OK);
     }
 }
