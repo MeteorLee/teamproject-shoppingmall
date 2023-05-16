@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
+import project.finalproject1backend.domain.SubCategory;
 import project.finalproject1backend.domain.User;
+import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
@@ -44,6 +46,9 @@ public class BuyInquiryService {
     public ResponseEntity<?> buyInquiryCreat(BuyInquiryDTO requestDTO, List<MultipartFile> buyImageList, PrincipalDTO principal) {
 
         Optional<User> user = userRepository.findByUserId(principal.getUserId());
+        if(!user.isPresent()){
+            return new ResponseEntity<>(new ErrorDTO("400","notExistImage"), HttpStatus.BAD_REQUEST);
+        }
 
         BuyInquiry buyInquiry = BuyInquiry.builder()
                 .buyInquiryId(user.get())
@@ -56,6 +61,10 @@ public class BuyInquiryService {
                 .build();
 
         buyInquiryRepository.save(buyInquiry);
+
+        if(buyImageList == null || buyImageList.isEmpty()){
+            throw new IllegalArgumentException("checkBuyImageList");
+        }
 
         for (MultipartFile m: buyImageList) {
             UploadDTO uploadDTO = uploadUtil.upload(m,path);
