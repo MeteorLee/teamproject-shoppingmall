@@ -1,6 +1,8 @@
 package project.finalproject1backend.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -173,30 +175,37 @@ public class UserService {
     }
 
 //    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
-    public ResponseEntity<?> getUsers(String select,String value) {
+    public ResponseEntity<?> getUsers(Pageable pageable, String select, String value) {
         // list로 주기
-        List<UsersInfoDTO> userList ;
+        Page<UserInfoResponseDTO> userPage = null;
         if(select==null){
-            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+            userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("ROLE_USER")){
-            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByRole(UserRole.ROLE_USER,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("ROLE_STANDBY")){
-            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByRole(UserRole.ROLE_STANDBY,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("ROLE_REFUSE")){
-            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByRole(UserRole.ROLE_REFUSE,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("업체명")){
-            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByCompanyName(value,pageable).map(UserInfoResponseDTO::new);
         }else if(select.equals("담당자명")){
-            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+            userPage=userRepository.findByManagerName(value,pageable).map(UserInfoResponseDTO::new);
         }else {
-            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+//            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+            userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
         }
 
-        return new ResponseEntity<>(userList,HttpStatus.OK);
+//        return new ResponseEntity<>(userList,HttpStatus.OK);
         // page로 주기
 //        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
 //        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
-//        return new ResponseEntity<>(new UsersGetResponseDTO(userList,userPage), HttpStatus.OK);
+        return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
@@ -228,9 +237,9 @@ public class UserService {
     }
 
     public ResponseEntity<?> getUserCount() {
-        int standbyCount=userRepository.findByRole(UserRole.ROLE_STANDBY).size();;
-        int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();;
-        int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();;
+        int standbyCount=userRepository.findByRole(UserRole.ROLE_STANDBY).size();
+        int userCount=userRepository.findByRole(UserRole.ROLE_USER).size();
+        int refuseCount=userRepository.findByRole(UserRole.ROLE_REFUSE).size();
         return new ResponseEntity<>(new UserCountResponseDTO(standbyCount,userCount,refuseCount),HttpStatus.OK);
     }
 
@@ -311,7 +320,7 @@ public class UserService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
-            mimeMessageHelper.setText("http://52.78.88.121:8080/findUserIdByManagerName/confirm?managerName="+managerName+"&email="+email+"&token="+token);
+            mimeMessageHelper.setText("https://bizcuratorproject.shop/findUserIdByManagerName/confirm?managerName="+managerName+"&email="+email+"&token="+token);
             javaMailSender.send(mailMessage);
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
@@ -373,7 +382,7 @@ public class UserService {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mailMessage,false,"UTF-8");
             mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject("bizcuratorproject.shop 인증메일");
-            mimeMessageHelper.setText("http://52.78.88.121:8080/setRandomPassword/confirm?userId="+userId+"&email="+email+"&token="+token);
+            mimeMessageHelper.setText("https://bizcuratorproject.shop/setRandomPassword/confirm?userId="+userId+"&email="+email+"&token="+token);
             javaMailSender.send(mailMessage);
         }catch (MessagingException e) {
             throw new IllegalArgumentException("email 전송 실패");
