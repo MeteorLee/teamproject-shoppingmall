@@ -96,9 +96,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    @GetMapping("/confirm")
-    public ResponseEntity<?> confirm( @RequestParam String token) {
-        return userService.confirm(token);
+    @GetMapping("/sendEmail/confirm")
+    public ResponseEntity<?> confirm(@RequestParam String email, @RequestParam String randomValue) {
+        return userService.confirm(email,randomValue);
     }
 
     @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")

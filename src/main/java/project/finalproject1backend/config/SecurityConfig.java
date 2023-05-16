@@ -102,7 +102,7 @@ public class SecurityConfig {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
                 .antMatchers("/", "/signup", "/login","/upload/*","/upload/view/*",
-                        "/upload/remove/*","/sendEmail","/confirm","/findUserIdByManagerName","/findUserIdByManagerName/confirm",
+                        "/upload/remove/*","/sendEmail","/sendEmail/confirm","/findUserIdByManagerName","/findUserIdByManagerName/confirm",
                         "/setRandomPassword/confirm","/setRandomPassword","/signup/checkId").permitAll()
 
                 .antMatchers("/account/**").hasAnyRole("STANDBY","USER", "ADMIN")
