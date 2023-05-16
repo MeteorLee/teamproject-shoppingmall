@@ -2,6 +2,8 @@ package project.finalproject1backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
+import project.finalproject1backend.domain.Inquiry.BuyInquiry;
+import project.finalproject1backend.domain.Inquiry.SaleInquiry;
 
 import javax.persistence.*;
 
@@ -36,6 +38,17 @@ public class AttachmentFile {
     @ManyToOne(fetch = FetchType.EAGER)
     public Product productAttachment;
 
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    public BuyInquiry buyImage;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    public BuyInquiry answerAttachment;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    public SaleInquiry saleAttachment;
 }
 /*
 id long [pk, increment]

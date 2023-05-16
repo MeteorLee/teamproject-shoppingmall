@@ -3,12 +3,16 @@ package project.finalproject1backend.domain.Inquiry;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Product;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.util.Encrypt256;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @ToString
@@ -20,6 +24,7 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class BuyInquiry {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,31 +37,36 @@ public class BuyInquiry {
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String company;
+    private String category;
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String companyAddress;
+    private String product;
 
     @Setter
-    @Convert(converter = Encrypt256.class)
-    private String address;
+    private int amount;
 
     @Setter
-    @Convert(converter = Encrypt256.class)
-    private String detailsAddress;
-
-    @Setter
+    @OneToMany(mappedBy = "buyImage", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ToString.Exclude
     @Builder.Default
-    private boolean mall = Boolean.FALSE;
+    private List<AttachmentFile> buyImageList = new ArrayList<>();
+
+    @Setter
+    @OneToMany(mappedBy = "answerAttachment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @Builder.Default
+    private List<AttachmentFile> answerAttachmentList = new ArrayList<>();
 
     @Setter
     @Convert(converter = Encrypt256.class)
-    private String mallAddress;
+    private String content;
 
     @Setter
-    @Convert(converter = Encrypt256.class)
-    private String attachment;
+    private LocalDate estimateWishDate;
+
+    @Setter
+    private LocalDate deliveryWishDate;
 
     @Setter
     @Enumerated(EnumType.STRING)
