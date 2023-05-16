@@ -205,9 +205,14 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
     })
     @GetMapping("/account/admin/users")
-    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
+    public ResponseEntity<?> getUsers( @Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
 //    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
         return userService.getUsers(pageable,select,value);
+//        return new ResponseEntity<>(pageable,HttpStatus.OK);
 //        return userService.getUsers(select,value);
     }
 
