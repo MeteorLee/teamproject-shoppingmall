@@ -403,4 +403,8 @@ public class UserService {
         }
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
+
+    public ResponseEntity<?> checkId(String userId) {
+        return new ResponseEntity<>(userRepository.existsByUserId(userId),HttpStatus.OK);
+    }
 }

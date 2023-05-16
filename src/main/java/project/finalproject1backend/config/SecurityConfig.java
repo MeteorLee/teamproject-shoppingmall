@@ -103,7 +103,7 @@ public class SecurityConfig {
 
                 .antMatchers("/", "/signup", "/login","/upload/*","/upload/view/*",
                         "/upload/remove/*","/sendEmail","/confirm","/findUserIdByManagerName","/findUserIdByManagerName/confirm",
-                        "/setRandomPassword/confirm","/setRandomPassword").permitAll()
+                        "/setRandomPassword/confirm","/setRandomPassword","/signup/checkId").permitAll()
 
                 .antMatchers("/account/**").hasAnyRole("STANDBY","USER", "ADMIN")
 

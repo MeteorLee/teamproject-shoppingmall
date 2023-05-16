@@ -44,6 +44,15 @@ public class UserController {
                                               BindingResult bindingResult,@RequestPart(required = false) List<MultipartFile> businessLicense) {
         return userService.signUp(requestDTO,businessLicense);
     }
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "중복 ID 체크 메서드", description = "중복 ID 체크 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Boolean.class)))
+    })
+    @GetMapping( "/signup/checkId")
+    public ResponseEntity<?> checkId(@RequestParam String userId) {
+        return userService.checkId(userId);
+    }
 
 
     @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
