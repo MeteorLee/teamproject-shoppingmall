@@ -208,4 +208,24 @@ public class ProductService {
         return ResponseEntity.notFound().build();
     }
 
+    public ResponseEntity<?> getProductDetails() {
+        // 전체 상품 조회
+        List<Product> products = productRepository.findAll();
+
+        // 상품 정보를 포함하는 리스트 생성
+        List<ProductFormDto.ProductResponseDto> responseDtos = new ArrayList<>();
+
+        for (Product product : products) {
+            // 필요한 정보를 포함하는 ProductResponseDto 객체 생성 및 설정
+            ProductFormDto.ProductResponseDto responseDto = new ProductFormDto.ProductResponseDto();
+            responseDto.setProductName(product.getProductName());
+            responseDto.setConsumerPrice(product.getConsumerPrice());
+            responseDto.setProductPrice(product.getProductPrice());
+            responseDto.setRecommended(product.isRecommended());
+
+            responseDtos.add(responseDto);
+        }
+
+        return ResponseEntity.ok(responseDtos);
+    }
 }

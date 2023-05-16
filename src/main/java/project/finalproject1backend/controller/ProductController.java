@@ -180,4 +180,17 @@ public class ProductController {
     public ResponseEntity<?> getProduct(@PathVariable("productId") Long productId) {
         return productService.getProduct(productId);
     }
+
+    @Tag(name = "API 상품조회", description = "상품 조회 api 입니다.")
+    @Operation(summary = "상품 요약 조회 메서드", description = "상품 요약 조회 메서드입니다.",security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ProductFormDto.ProductResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @GetMapping("/account/products/summary")
+    public ResponseEntity<?> getProductDetails() {
+        return productService.getProductDetails();
+    }
+
+
 }
