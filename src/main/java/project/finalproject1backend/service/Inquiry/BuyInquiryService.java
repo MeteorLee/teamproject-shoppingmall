@@ -17,6 +17,7 @@ import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
+import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
 import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.AttachmentFileRepository;
 import project.finalproject1backend.repository.Inquiry.BuyInquiryRepository;
@@ -47,7 +48,7 @@ public class BuyInquiryService {
 
         Optional<User> user = userRepository.findByUserId(principal.getUserId());
         if(!user.isPresent()){
-            return new ResponseEntity<>(new ErrorDTO("400","notExistImage"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
         }
 
         BuyInquiry buyInquiry = BuyInquiry.builder()
