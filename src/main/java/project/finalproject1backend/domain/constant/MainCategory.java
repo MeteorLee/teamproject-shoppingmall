@@ -13,8 +13,7 @@ public enum MainCategory {
     SAFETY_EQUIPMENT("소방/안전설비"),
     ELECTRONIC_APPLIANCES("전자제품"),
     CLEANING_FACILITY_MANAGEMENT("청소/시설관리"),
-    OFFICE_SUPPLIES("사무용품"),
-    ETC("기타");
+    OFFICE_SUPPLIES("사무용품");
 
     private final String category;
 
