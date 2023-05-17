@@ -25,6 +25,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,13 +107,14 @@ public class ProductService {
 //            for (int i = 0; i < itemImgFileList.size(); i++) {
 //                productImgService.updateProductImg(productImgIds.get(i), itemImgFileList.get(i));
 //            }
-    public ResponseEntity<?> modify(PrincipalDTO principal, Long productId, ProductFormDto productFormDto, List<MultipartFile> productImgFileList) throws Exception{
+    public ResponseEntity<?> modify(PrincipalDTO principal, ProductFormDto productFormDto, List<MultipartFile> productImgFileList) throws Exception{
         Optional<User> user=userRepository.findById(principal.getId());
         if(!user.isPresent()){
             return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
         }
 
         try {
+
             // 상품 수정
             Product product = productRepository.findById(productFormDto.getId())
                     .orElseThrow(() -> new EntityNotFoundException("해당 상품이 존재하지 않습니다."));
@@ -156,7 +158,6 @@ public class ProductService {
             return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
         }
         productRepository.deleteById(productId);
-        attachmentFileRepository.deleteById(productId);
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
@@ -178,9 +179,11 @@ public class ProductService {
 //    }
 //
 //    public ResponseEntity<List<Product>> getProductByRandom(String subCategory) {
-//        List<Product> products = subCategoryRepository.findRandomByName(subCategory);
+//        List<Product> products = subCategoryRepository.findRandomProductsBySubCategory(subCategory);
 //        return new ResponseEntity<>(products, HttpStatus.OK);
 //    }
+
+
     public ResponseEntity<?> getProduct(Long productId) {
         ProductFormDto productFormDto = productRepository.findById(productId)
                 .map(ProductFormDto::of)
