@@ -181,7 +181,6 @@ public class ProductService {
 //        List<Product> products = subCategoryRepository.findRandomByName(subCategory);
 //        return new ResponseEntity<>(products, HttpStatus.OK);
 //    }
-
     public ResponseEntity<?> getProduct(Long productId) {
         ProductFormDto productFormDto = productRepository.findById(productId)
                 .map(ProductFormDto::of)

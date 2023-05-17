@@ -15,7 +15,6 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     Optional<Product> findById(Long id); //아이디로 찾기
 
 
-
     List<Product> findByMainCategory(MainCategory category); //메인카테고리로 찾기
 
     List<Product> findByMainCategoryAndProductSubcategory(MainCategory mainCategory, String subCategoryName);

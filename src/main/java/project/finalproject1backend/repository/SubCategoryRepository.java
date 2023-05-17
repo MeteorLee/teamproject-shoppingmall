@@ -14,7 +14,6 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory,Long> {
     Optional<SubCategory> findByName(String name);
 
     List<SubCategory> findAllByMainCategory(MainCategory mainCategory);
-
 //    @Query(value = "SELECT * FROM sub_category WHERE sub_category = :name ORDER BY RAND() LIMIT 5", nativeQuery = true)
 //    List<Product> findRandomByName(@Param("subCategoryName") String subCategoryName);
 

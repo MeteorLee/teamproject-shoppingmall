@@ -68,7 +68,6 @@ public class Product extends AuditingFields{
     @Column(nullable = false, length = 20)
     @Setter
     private MainCategory mainCategory;  //대분류
-
     @Setter
     private String message;  //상품설명
     @Setter
