@@ -19,8 +19,6 @@ import java.util.Objects;
 @ToString
 @Getter
 @Builder
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE product SET is_deleted = true, deleted_at=now() WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity

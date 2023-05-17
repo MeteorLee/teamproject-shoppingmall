@@ -177,10 +177,10 @@ public class ProductService {
 //        return new ResponseEntity<>(products, HttpStatus.OK);
 //    }
 //
-    public ResponseEntity<List<Product>> getProductByRandom(String subCategory) {
-        List<Product> products = productRepository.findRandomBySubCategoryName(subCategory);
-        return new ResponseEntity<>(products, HttpStatus.OK);
-    }
+//    public ResponseEntity<List<Product>> getProductByRandom(String subCategory) {
+//        List<Product> products = subCategoryRepository.findRandomByName(subCategory);
+//        return new ResponseEntity<>(products, HttpStatus.OK);
+//    }
 
     public ResponseEntity<?> getProduct(Long productId) {
         ProductFormDto productFormDto = productRepository.findById(productId)
