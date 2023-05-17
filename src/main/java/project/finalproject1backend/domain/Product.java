@@ -19,8 +19,6 @@ import java.util.Objects;
 @ToString
 @Getter
 @Builder
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true, deleted_at=now() WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -63,19 +61,22 @@ public class Product extends AuditingFields{
     private int minimumQuantity;     //최소수량
 
     @Setter
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)    //ORDINAL? STRING?
     private ProductStatus productStatus;  //판매상태
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Setter
     private MainCategory mainCategory;  //대분류
-
     @Setter
     private String message;  //상품설명
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     private SubCategory productSubcategory;  //중분류
+
+    @Setter
+    @Column(nullable = false)
+    private boolean isRecommended; // 추천여부
 
     //유저의 현황 관련
     @OneToMany(mappedBy = "cartProduct", cascade = CascadeType.ALL)
