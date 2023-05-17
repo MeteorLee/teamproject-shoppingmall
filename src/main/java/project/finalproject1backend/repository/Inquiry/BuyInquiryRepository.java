@@ -10,6 +10,4 @@ import java.util.Optional;
 
 public interface BuyInquiryRepository extends JpaRepository<BuyInquiry, Long> {
 
-
-
 }
