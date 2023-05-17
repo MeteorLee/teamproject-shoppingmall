@@ -17,26 +17,26 @@ public class AttachmentFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id; //파일번호
+    public Long id;
     @Setter
-    public String fileName;  //파일명
+    public String fileName;
     @Setter
-    public String originalFileName; //원본파일명
+    public String originalFileName;
     @Setter
-    public String thumbFileName; //썸네일파일명
+    public String thumbFileName;
     @Setter
-    public String filePath;  //파일경로
+    public String filePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    public User userAdditionalData;  //추가정보
+    public User userAdditionalData;
     @Setter
     @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
-    public User userBusinessLicense;  //사업자등록증
+    public User userBusinessLicense;
 
     @Setter
     @ManyToOne(fetch = FetchType.EAGER)
-    public Product productAttachment; //상품이미지
+    public Product productAttachment;
 
     @Setter
     @ManyToOne(fetch = FetchType.EAGER)

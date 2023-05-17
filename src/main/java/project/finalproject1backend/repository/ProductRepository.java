@@ -15,9 +15,11 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     Optional<Product> findById(Long id); //아이디로 찾기
 
 
+
+
     List<Product> findByMainCategory(MainCategory category); //메인카테고리로 찾기
 
     List<Product> findByMainCategoryAndProductSubcategory(MainCategory mainCategory, String subCategoryName);
-
-
+//    @Query(value = "SELECT * FROM product WHERE sub_category_name = :subCategoryName ORDER BY RAND() LIMIT 5", nativeQuery = true)
+//    List<Product> findRandomBySubCategoryName(@Param("subCategoryName") String subCategoryName);
 }
