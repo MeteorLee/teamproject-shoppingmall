@@ -1,6 +1,7 @@
 package project.finalproject1backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -50,11 +51,11 @@ public class User extends AuditingFields{
     @Convert(converter = Encrypt256.class)
     private String corporateNumber;
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "userBusinessLicense", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
     @Builder.Default
-    private List<AttachmentFile> businessLicense = new ArrayList<>();
+    private Set<AttachmentFile> businessLicense = new HashSet<>();
 
     //담당자관련
     @Setter
@@ -70,23 +71,24 @@ public class User extends AuditingFields{
     private String phoneNumber;
 
     //유저의 현황 관련
+    @JsonIgnore
     @OneToMany(mappedBy = "cartUser", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Cart> carts = new ArrayList<>();
+    private Set<Cart> carts = new HashSet<>();
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
     @Builder.Default
-    private List<BuyInquiry> buyInquiry = new ArrayList<>();
+    private Set<BuyInquiry> buyInquiry = new HashSet<>();
 
-    @JsonManagedReference
+    @JsonIgnore
     @OneToMany(mappedBy = "saleInquiryId", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<SaleInquiry> saleInquiry = new ArrayList<>();
+    private Set<SaleInquiry> saleInquiry = new HashSet<>();
 
     @Setter
     @Enumerated(EnumType.STRING)

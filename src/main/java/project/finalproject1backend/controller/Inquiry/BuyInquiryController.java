@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +50,7 @@ public class BuyInquiryController {
         return buyInquiryService.buyInquiryCreat(requestDTO, buyImageList, principal);
 
     }
-
+    @Transactional
     @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
     @Operation(summary = "마이 페이지(구매 문의 조회)", description = "마이 페이지(구매 문의 조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {

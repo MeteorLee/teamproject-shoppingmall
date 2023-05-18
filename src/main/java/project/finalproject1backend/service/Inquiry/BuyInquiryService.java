@@ -91,25 +91,25 @@ public class BuyInquiryService {
 
         List<BuyInquiryResponseDTO> buyInquiryResponseDTOList = new ArrayList<>();
 
-//        for (BuyInquiry buyInquiry:principal.getBuyInquiry()) {
-//            buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
-//                    .userId(principal.getUserId())
-//                    .email(principal.getEmail())
-//                    .phoneNumber(principal.getPhoneNumber())
-//                    .companyName(principal.getCompanyName())
-//                    .category(buyInquiry.getCategory())
-//                    .product(buyInquiry.getProduct())
-//                    .amount(buyInquiry.getAmount())
-//                    .buyImageList(buyInquiry.getBuyImageList())
-//                    .content(buyInquiry.getContent())
-//                    .estimateWishDate(buyInquiry.getEstimateWishDate())
-//                    .deliveryWishDate(buyInquiry.getDeliveryWishDate())
-//                    .state(buyInquiry.getState())
-//                    .build());
-//        }
+        for (BuyInquiry buyInquiry:principal.getBuyInquiry()) {
+            buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
+                    .userId(principal.getUserId())
+                    .email(principal.getEmail())
+                    .phoneNumber(principal.getPhoneNumber())
+                    .companyName(principal.getCompanyName())
+                    .category(buyInquiry.getCategory())
+                    .product(buyInquiry.getProduct())
+                    .amount(buyInquiry.getAmount())
+                    .buyImageList(buyInquiry.getBuyImageList())
+                    .content(buyInquiry.getContent())
+                    .estimateWishDate(buyInquiry.getEstimateWishDate())
+                    .deliveryWishDate(buyInquiry.getDeliveryWishDate())
+                    .state(buyInquiry.getState())
+                    .build());
+        }
 
-//        return new ResponseEntity<>(buyInquiryResponseDTOList, HttpStatus.OK);
-        return new ResponseEntity<>(principal.getBuyInquiry(), HttpStatus.OK);
+        return new ResponseEntity<>(buyInquiryResponseDTOList, HttpStatus.OK);
+//        return new ResponseEntity<>(principal.getBuyInquiry(), HttpStatus.OK);
     }
 //    public ResponseEntity<?> getUserInfo(String userId) {
 //        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);

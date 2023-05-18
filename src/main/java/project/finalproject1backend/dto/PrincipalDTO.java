@@ -24,13 +24,13 @@ public class PrincipalDTO implements UserDetails {
     private String companyName;
     private LocalDate openingDate;
     private String corporateNumber;
-    private List<AttachmentFile> businessLicense;
+    private Set<AttachmentFile> businessLicense;
     private String managerName;
     private String email;
     private String phoneNumber;
-    private List<Cart> carts;
-    private List<BuyInquiry> buyInquiry;
-    private List<SaleInquiry> saleInquiry;
+    private Set<Cart> carts;
+    private Set<BuyInquiry> buyInquiry;
+    private Set<SaleInquiry> saleInquiry;
     private Set<UserRole> role ;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
