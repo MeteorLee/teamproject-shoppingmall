@@ -7,7 +7,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.pay.PaymentResponseDTO;
 import project.finalproject1backend.exception.PaymentException;
 
 import java.nio.file.AccessDeniedException;

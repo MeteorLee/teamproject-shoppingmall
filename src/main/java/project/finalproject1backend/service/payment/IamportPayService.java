@@ -2,6 +2,7 @@ package project.finalproject1backend.service.payment;
 
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +24,33 @@ public class IamportPayService {
 
     private final UserService userService;
 
+    /**
+     * 아임포트 연결
+     * 
+     * @return
+     */
     private IamportClient getClient() {
 
         return new IamportClient(api_key, api_secret);
     }
 
+    /**
+     * 유저 검증
+     * 
+     * @param email
+     */
     public void verifyEmail(String email) {
 
         // TODO: 2023-05-18 주문번호 -> orders -> username -> user 검증 로직 구현 필요
 
     }
 
+    /**
+     * 금액 검증
+     * 
+     * @param amount
+     * @param imp_uid
+     */
     public void verifyAmount(Integer amount, String imp_uid) {
 
         IamportClient client = getClient();
@@ -45,6 +62,11 @@ public class IamportPayService {
 
             if (amount != iamportPaymentAmount) {
                 // TODO: 2023-05-18 값이 안맞을 경우 로직 필요 (DB정보 삭제 + 결제 취소 로직 필요)
+
+                // imp_uid를 통한 전액취소
+                CancelData cancel_data = new CancelData(imp_uid, true);
+                IamportResponse<Payment> cancel_response = client.cancelPaymentByImpUid(cancel_data);
+
             }
 
         } catch (IamportResponseException | IOException e) {
@@ -53,6 +75,11 @@ public class IamportPayService {
 
     }
 
+    /**
+     * 주문 번호 검증
+     * 
+     * @param requestDTO
+     */
     public void verifyUid(IamportCallbackDTO requestDTO) {
 
         IamportClient client = getClient();
@@ -61,6 +88,10 @@ public class IamportPayService {
 
         try {
             IamportResponse<Payment> payment_response = client.paymentByImpUid(imp_uid);
+
+            // TODO: 2023-05-18 가맹점 번호 검증 로직 구현 필요
+            String iamportMerchantUid = payment_response.getResponse().getMerchantUid();
+            // String requestDTOMerchantUid = ...
 
 
         } catch (IamportResponseException | IOException e) {

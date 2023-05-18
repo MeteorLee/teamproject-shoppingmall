@@ -1,10 +1,12 @@
 package project.finalproject1backend.controller.payment;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project.finalproject1backend.dto.pay.PaymentResponseDTO;
+import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportCallbackDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportVerificaitonDTO;
 import project.finalproject1backend.service.payment.IamportPayService;
@@ -26,15 +28,17 @@ public class IamportPaymentController {
      * @return
      */
     @PostMapping("/callback")
-    public PaymentResponseDTO callback(IamportCallbackDTO requestDTO, Principal principal) {
+    public ResponseEntity<ResponseDTO> callback(IamportCallbackDTO requestDTO, Principal principal) {
 
+        // 유저 검증 로직
         iamportPayService.verifyEmail(principal.getName());
 
+        // 주문 번호 검증
         iamportPayService.verifyUid(requestDTO);
 
         PaymentResponseDTO paymentResponse = new PaymentResponseDTO();
 
-        return paymentResponse;
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
     /**
@@ -45,14 +49,21 @@ public class IamportPaymentController {
      * @return
      */
     @PostMapping("/verify")
-    public PaymentResponseDTO verify(IamportVerificaitonDTO requestDTO, Principal principal) {
+    public ResponseEntity<ResponseDTO> verify(IamportVerificaitonDTO requestDTO, Principal principal) {
 
         iamportPayService.verifyEmail(principal.getName());
 
         iamportPayService.verifyAmount(requestDTO.getAmount(), requestDTO.getImp_uid());
 
-        PaymentResponseDTO paymentResponse = new PaymentResponseDTO();
-
-        return paymentResponse;
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
+
+    @PostMapping("/refund")
+    public ResponseEntity<ResponseDTO> refund() {
+
+
+
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
 }
