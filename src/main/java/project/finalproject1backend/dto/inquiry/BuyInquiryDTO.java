@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
 import project.finalproject1backend.domain.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Data

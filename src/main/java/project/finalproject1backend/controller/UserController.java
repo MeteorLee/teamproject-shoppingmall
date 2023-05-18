@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +46,15 @@ public class UserController {
     public ResponseEntity<?> signUp(@RequestPart(value = "requestDTO") @Valid UserSignUpRequestDTO requestDTO,
                                               BindingResult bindingResult,@RequestPart(required = false) List<MultipartFile> businessLicense) {
         return userService.signUp(requestDTO,businessLicense);
+    }
+    @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
+    @Operation(summary = "중복 ID 체크 메서드", description = "중복 ID 체크 메서드입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Boolean.class)))
+    })
+    @GetMapping( "/signup/checkId")
+    public ResponseEntity<?> checkId(@RequestParam String userId) {
+        return userService.checkId(userId);
     }
 
 
@@ -87,9 +99,9 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    @GetMapping("/confirm")
-    public ResponseEntity<?> confirm( @RequestParam String token) {
-        return userService.confirm(token);
+    @GetMapping("/sendEmail/confirm")
+    public ResponseEntity<?> confirm(@RequestParam String email, @RequestParam String randomValue) {
+        return userService.confirm(email,randomValue);
     }
 
     @Tag(name = "API 로그인/회원가입", description = "로그인/회원가입 api 입니다.")
@@ -146,7 +158,8 @@ public class UserController {
     })
     @GetMapping("/account")
     public ResponseEntity<?> getUser(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
-        return new ResponseEntity<>(new UserInfoResponseDTO(principal),HttpStatus.OK);
+//        return new ResponseEntity<>(new UserInfoResponseDTO(principal),HttpStatus.OK);
+        return userService.getUserInfo(principal.getUserId());
     }
 
 
@@ -175,6 +188,17 @@ public class UserController {
         return userService.modifyLicense(principal,modifyRequestDTO,businessLicense);
     }
     @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(account 추가첨부파일 등록)", description = "마이 페이지(account 추가첨부파일 등록) 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping(value = "/account/additionalData",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> additionalData(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal,@RequestPart(required = false) List<MultipartFile> additionalData) {
+        return userService.additionalData(principal,additionalData);
+    }
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
     @Operation(summary = "마이 페이지(사업자등록 첨부여부 확인)", description = "마이 페이지(사업자등록 첨부여부 확인) 메서드입니다.",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
@@ -186,6 +210,7 @@ public class UserController {
     }
 
 
+
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
     @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.select : “업체명”,”ROLE_REFUSE “ROLE_USER”,”ROLE_STANDBY, “담당자명”",
             security ={ @SecurityRequirement(name = "bearer-key") })
@@ -193,10 +218,15 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
     })
     @GetMapping("/account/admin/users")
-//    public ResponseEntity<?> getUsers(@Parameter(hidden = true) @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, @RequestParam String select,@RequestParam String value) {
-    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
-//        return userService.getUsers(pageable,select,value);
-        return userService.getUsers(select,value);
+    public ResponseEntity<?> getUsers( @Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
+//    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
+        return userService.getUsers(pageable,select,value);
+//        return new ResponseEntity<>(pageable,HttpStatus.OK);
+//        return userService.getUsers(select,value);
     }
 
 
