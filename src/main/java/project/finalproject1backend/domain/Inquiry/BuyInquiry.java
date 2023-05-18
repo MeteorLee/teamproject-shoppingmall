@@ -27,8 +27,7 @@ import java.util.Set;
 public class BuyInquiry {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
 
     @ManyToOne(fetch = FetchType.EAGER)

@@ -22,8 +22,7 @@ import java.util.Set;
 @Entity
 public class SaleInquiry {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)

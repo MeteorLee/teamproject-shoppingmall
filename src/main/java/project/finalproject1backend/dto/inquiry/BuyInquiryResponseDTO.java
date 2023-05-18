@@ -4,6 +4,7 @@ import lombok.*;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
 import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
+import project.finalproject1backend.dto.AttachmentDTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BuyInquiryResponseDTO {
-
+    private String inquiryId;
     private String userId;
 
     private String email;
@@ -31,7 +32,8 @@ public class BuyInquiryResponseDTO {
 
     private int amount;
 
-    private List<buyImageListInfo> buyImageList = new ArrayList<>();
+    private List<AttachmentDTO> buyImageList = new ArrayList<>();
+    private List<AttachmentDTO> answerAttachmentList = new ArrayList<>();
 
     private String content;
 
@@ -41,21 +43,9 @@ public class BuyInquiryResponseDTO {
 
     private BuyInquiryState state;
 
-    @Getter
-    @Setter
-    private class buyImageListInfo{
-        private String fileName;
-        private String filePath;
-        private String originalFileName;
-
-        public buyImageListInfo(AttachmentFile a) {
-            this.fileName = a.getFileName();
-            this.filePath = a.getFilePath();
-            this.originalFileName = a.getOriginalFileName();
-        }
-    }
 
     public BuyInquiryResponseDTO(BuyInquiry b) {
+        this.inquiryId=b.getId();
         this.userId = b.getBuyInquiryId().getUserId();
         this.email = b.getBuyInquiryId().getEmail();
         this.phoneNumber = b.getBuyInquiryId().getPhoneNumber();
@@ -64,7 +54,10 @@ public class BuyInquiryResponseDTO {
         this.product = b.getProduct();
         this.amount = b.getAmount();
         if(!(b.getBuyImageList()==null||b.getBuyImageList().isEmpty())) {
-            this.buyImageList = b.getBuyImageList().stream().map(BuyInquiryResponseDTO.buyImageListInfo::new).toList();
+            this.buyImageList = b.getBuyImageList().stream().map(AttachmentDTO::new).toList();
+        }
+        if(!(b.getAnswerAttachmentList()==null||b.getAnswerAttachmentList().isEmpty())) {
+            this.buyImageList = b.getAnswerAttachmentList().stream().map(AttachmentDTO::new).toList();
         }
         this.content = b.getContent();
         this.estimateWishDate = b.getEstimateWishDate();

@@ -10,7 +10,8 @@ import project.finalproject1backend.domain.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface BuyInquiryRepository extends JpaRepository<BuyInquiry, Long> {
+public interface BuyInquiryRepository extends JpaRepository<BuyInquiry, String> {
     Page<BuyInquiry> findByBuyInquiryId_CompanyName(String companyName,Pageable pageable);
+    List<BuyInquiry> findByBuyInquiryId_UserId(String userId);
 
 }
