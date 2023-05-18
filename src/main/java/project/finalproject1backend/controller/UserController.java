@@ -158,7 +158,8 @@ public class UserController {
     })
     @GetMapping("/account")
     public ResponseEntity<?> getUser(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
-        return new ResponseEntity<>(new UserInfoResponseDTO(principal),HttpStatus.OK);
+//        return new ResponseEntity<>(new UserInfoResponseDTO(principal),HttpStatus.OK);
+        return userService.getUserInfo(principal.getUserId());
     }
 
 
@@ -187,6 +188,17 @@ public class UserController {
         return userService.modifyLicense(principal,modifyRequestDTO,businessLicense);
     }
     @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
+    @Operation(summary = "마이 페이지(account 추가첨부파일 등록)", description = "마이 페이지(account 추가첨부파일 등록) 메서드입니다.",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping(value = "/account/additionalData",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> additionalData(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal,@RequestPart(required = false) List<MultipartFile> additionalData) {
+        return userService.additionalData(principal,additionalData);
+    }
+    @Tag(name = "API 마이페이지", description = "마이페이지 api 입니다.")
     @Operation(summary = "마이 페이지(사업자등록 첨부여부 확인)", description = "마이 페이지(사업자등록 첨부여부 확인) 메서드입니다.",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
@@ -196,6 +208,7 @@ public class UserController {
     public ResponseEntity<?> booleanBusinessLicense(@Parameter(hidden = true) @AuthenticationPrincipal PrincipalDTO principal) {
         return userService.booleanBusinessLicense(principal);
     }
+
 
 
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")

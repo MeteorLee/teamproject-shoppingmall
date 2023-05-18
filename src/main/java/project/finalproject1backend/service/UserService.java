@@ -42,8 +42,8 @@ public class UserService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-//    private String path = "C:\\upload";  //로컬 테스트용
-    private String path = "/home/ubuntu/FinalProject/upload/users";  // 배포용
+    private String path = "C:\\upload";  //로컬 테스트용
+//    private String path = "/home/ubuntu/FinalProject/upload/users";  // 배포용
 
     public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO, List<MultipartFile> businessLicense){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
@@ -177,28 +177,28 @@ public class UserService {
 //    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
     public ResponseEntity<?> getUsers(Pageable pageable, String select, String value) {
         // list로 주기
-        Page<UserInfoResponseDTO> userPage = null;
+        Page<UsersInfoDTO> userPage = null;
         if(select==null){
 //            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
-            userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
+            userPage = userRepository.findAll(pageable).map(UsersInfoDTO::new);
         }else if(select.equals("ROLE_USER")){
 //            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByRole(UserRole.ROLE_USER,pageable).map(UserInfoResponseDTO::new);
+            userPage=userRepository.findByRole(UserRole.ROLE_USER,pageable).map(UsersInfoDTO::new);
         }else if(select.equals("ROLE_STANDBY")){
 //            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByRole(UserRole.ROLE_STANDBY,pageable).map(UserInfoResponseDTO::new);
+            userPage=userRepository.findByRole(UserRole.ROLE_STANDBY,pageable).map(UsersInfoDTO::new);
         }else if(select.equals("ROLE_REFUSE")){
 //            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByRole(UserRole.ROLE_REFUSE,pageable).map(UserInfoResponseDTO::new);
+            userPage=userRepository.findByRole(UserRole.ROLE_REFUSE,pageable).map(UsersInfoDTO::new);
         }else if(select.equals("업체명")){
 //            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByCompanyName(value,pageable).map(UserInfoResponseDTO::new);
+            userPage=userRepository.findByCompanyName(value,pageable).map(UsersInfoDTO::new);
         }else if(select.equals("담당자명")){
 //            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByManagerName(value,pageable).map(UserInfoResponseDTO::new);
+            userPage=userRepository.findByManagerName(value,pageable).map(UsersInfoDTO::new);
         }else {
 //            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
-            userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
+            userPage = userRepository.findAll(pageable).map(UsersInfoDTO::new);
         }
 
 //        return new ResponseEntity<>(userList,HttpStatus.OK);
@@ -209,7 +209,11 @@ public class UserService {
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
-        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);
+
+        attachmentFileRepository.findByUserAdditionalData(userRepository.findByUserId(userId).get());
+        return new ResponseEntity<>(userRepository.findByUserId(userId).map(
+                user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user))),
+                HttpStatus.OK);
     }
     public ResponseEntity<?> roleUser(String userId){
         Set<UserRole> roleUser = new HashSet<>();
@@ -422,5 +426,29 @@ public class UserService {
 
     public ResponseEntity<?> checkId(String userId) {
         return new ResponseEntity<>(userRepository.existsByUserId(userId),HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> additionalData(PrincipalDTO principal, List<MultipartFile> additionalData) {
+        Optional<User> user = userRepository.findByUserId(principal.getUserId());
+        if(additionalData==null || additionalData.isEmpty()) {
+            throw new IllegalArgumentException("checkAdditionalData");
+        }
+        List<AttachmentFile> attachmentFileList = attachmentFileRepository.findByUserAdditionalData(user.get());
+        if(!(attachmentFileList==null || attachmentFileList.isEmpty())){
+            for (AttachmentFile a:attachmentFileList) {
+                attachmentFileRepository.delete(a);
+            }
+        }
+        for (MultipartFile i: additionalData){
+            UploadDTO u = uploadUtil.upload(i,path);
+            AttachmentFile attachmentFile = AttachmentFile.builder()
+                    .fileName(u.getFileName())
+                    .filePath(path)
+                    .originalFileName(u.getOriginalName())
+                    .userAdditionalData(user.get())
+                    .build();
+            attachmentFileRepository.save(attachmentFile);
+        }
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 }
