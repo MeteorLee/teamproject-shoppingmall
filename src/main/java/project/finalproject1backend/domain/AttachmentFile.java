@@ -27,10 +27,9 @@ public class AttachmentFile {
     @Setter
     public String filePath;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     public User userAdditionalData;
     @Setter
-    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     public User userBusinessLicense;
 

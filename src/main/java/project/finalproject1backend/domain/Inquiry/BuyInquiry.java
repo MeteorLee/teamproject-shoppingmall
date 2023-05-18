@@ -1,6 +1,8 @@
 package project.finalproject1backend.domain.Inquiry;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -19,8 +21,6 @@ import java.util.Set;
 @ToString
 @Getter
 @Builder
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true, deleted_at=now() WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -30,8 +30,8 @@ public class BuyInquiry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     private User buyInquiryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,16 +49,18 @@ public class BuyInquiry {
     private int amount;
 
     @Setter
+    @JsonIgnore
     @OneToMany(mappedBy = "buyImage", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
     @Builder.Default
-    private List<AttachmentFile> buyImageList = new ArrayList<>();
+    private Set<AttachmentFile> buyImageList = new HashSet<>();
 
     @Setter
+    @JsonIgnore
     @OneToMany(mappedBy = "answerAttachment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
     @Builder.Default
-    private List<AttachmentFile> answerAttachmentList = new ArrayList<>();
+    private Set<AttachmentFile> answerAttachmentList = new HashSet<>();
 
     @Setter
     @Convert(converter = Encrypt256.class)

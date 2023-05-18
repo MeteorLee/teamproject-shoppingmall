@@ -35,7 +35,7 @@ public class BuyInquiryResponseDTO {
 
     private int amount;
 
-    private List<AttachmentFile> buyImageList = new ArrayList<>();
+    private Set<AttachmentFile> buyImageList = new HashSet<>();
 
     private String content;
 
