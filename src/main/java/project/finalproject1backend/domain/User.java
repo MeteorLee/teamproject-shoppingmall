@@ -49,6 +49,7 @@ public class User extends AuditingFields{
     @Setter
     @Convert(converter = Encrypt256.class)
     private String corporateNumber;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "userBusinessLicense", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
@@ -75,11 +76,13 @@ public class User extends AuditingFields{
     private List<Cart> carts = new ArrayList<>();
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<BuyInquiry> buyInquiry = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "saleInquiryId", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default

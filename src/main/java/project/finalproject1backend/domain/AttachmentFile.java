@@ -42,6 +42,7 @@ public class AttachmentFile {
     @ManyToOne(fetch = FetchType.EAGER)
     public BuyInquiry buyImage;
 
+    @JsonBackReference
     @Setter
     @ManyToOne(fetch = FetchType.EAGER)
     public BuyInquiry answerAttachment;

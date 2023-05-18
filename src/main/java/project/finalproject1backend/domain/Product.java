@@ -1,5 +1,7 @@
 package project.finalproject1backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -84,6 +86,7 @@ public class Product extends AuditingFields{
     private List<Cart> carts = new ArrayList<>();
 
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
+    @JsonManagedReference
     @OneToMany(mappedBy = "buyInquiryProduct", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
