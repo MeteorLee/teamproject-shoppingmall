@@ -78,7 +78,7 @@ public class Product extends AuditingFields{
     private SubCategory productSubcategory;  //중분류
 
     //유저의 현황 관련
-    @OneToMany(mappedBy = "cartProduct", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cartItems", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<Cart> carts = new ArrayList<>();
