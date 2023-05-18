@@ -18,13 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
 import project.finalproject1backend.dto.inquiry.SaleInquiryDTO;
-import project.finalproject1backend.service.Inquiry.BuyInquiryService;
 import project.finalproject1backend.service.Inquiry.SaleInquiryService;
 
 import javax.validation.Valid;

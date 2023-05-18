@@ -20,8 +20,6 @@ import java.util.*;
 @ToString
 @Getter
 @Builder
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true, deleted_at=now() WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -78,12 +76,6 @@ public class Product extends AuditingFields{
     @ManyToOne(fetch = FetchType.LAZY)
     private SubCategory productSubcategory;  //중분류
 
-    //유저의 현황 관련
-    @JsonIgnore
-    @OneToMany(mappedBy = "cartProduct", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @ToString.Exclude
-    @Builder.Default
-    private Set<Cart> carts = new HashSet<>();
 
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
     @JsonIgnore

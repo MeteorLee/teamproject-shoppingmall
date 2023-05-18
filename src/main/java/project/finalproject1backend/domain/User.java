@@ -79,7 +79,7 @@ public class User extends AuditingFields{
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
 
     @JsonIgnore
-    @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "buyInquiryId", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private Set<BuyInquiry> buyInquiry = new HashSet<>();
