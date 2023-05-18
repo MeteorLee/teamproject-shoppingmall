@@ -87,11 +87,6 @@ public class BuyInquiryService {
 //        if(!(principal.getBuyInquiry().iterator().next().==null||principal.getBusinessLicense().isEmpty())) {
 //        }
         for (BuyInquiry buyInquiry:principal.getBuyInquiry()) {
-            List<BuyInquiryResponseDTO.buyImageListInfo> imageListInfo = new ArrayList<>();
-            for (AttachmentFile a:buyInquiry.getBuyImageList()) {
-                imageListInfo.add(new BuyInquiryResponseDTO.buyImageListInfo(a));
-            }
-//                    buyInquiry.getBuyImageList().stream().map(BuyInquiryResponseDTO.buyImageListInfo::new).collect(Collectors.toList();
 
             buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
                     .userId(principal.getUserId())
@@ -101,7 +96,7 @@ public class BuyInquiryService {
                     .category(buyInquiry.getCategory())
                     .product(buyInquiry.getProduct())
                     .amount(buyInquiry.getAmount())
-                    .buyImageList(imageListInfo)
+                    .buyImageList(buyInquiry.getBuyImageList().stream().map(BuyInquiryResponseDTO.buyImageListInfo::new).toList())
                     .content(buyInquiry.getContent())
                     .estimateWishDate(buyInquiry.getEstimateWishDate())
                     .deliveryWishDate(buyInquiry.getDeliveryWishDate())
@@ -110,11 +105,8 @@ public class BuyInquiryService {
         }
 
         return new ResponseEntity<>(buyInquiryResponseDTOList, HttpStatus.OK);
-//        return new ResponseEntity<>(principal.getBuyInquiry(), HttpStatus.OK);
     }
-    if(!(u.getBusinessLicense()==null||u.getBusinessLicense().isEmpty())){
-        this.businessLicense = u.getBusinessLicense().stream().map(businessLicenseInfo::new).collect(Collectors.toList());
-    }
+
 
 //    public ResponseEntity<?> getUserInfo(String userId) {
 //        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);
