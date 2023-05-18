@@ -58,4 +58,6 @@ public class Orders extends AuditingFields {
     @Setter
     private OrderStatus status;
 
+    public void setUser(User user){ this.user = user;}
+
 }
