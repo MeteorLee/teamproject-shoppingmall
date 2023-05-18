@@ -43,7 +43,7 @@ public class BuyInquiryService {
 
     private final UploadUtil uploadUtil;
 
-    private String path = "C:\\Users\\user\\Downloads\\my";  //로컬 테스트용
+    private String path = "C:\\Users\\user\\Downloads\\my\\파이널 프로젝트 저장 폴더";  //로컬 테스트용
 
 //    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
 
@@ -134,7 +134,38 @@ public class BuyInquiryService {
 
         return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
     }
+
+    public ResponseEntity<?> buyInquiryAnswerAttachment(Long inquiryId, List<MultipartFile> answerAttachmentList) {
+
+        Optional<BuyInquiry> buyInquiry = buyInquiryRepository.findById(inquiryId);
+
+        if (answerAttachmentList == null || answerAttachmentList.isEmpty()) {
+            throw new IllegalArgumentException("checkAnswerAttachmentList");
+//            return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
+        }
+
+        for (MultipartFile m : answerAttachmentList) {
+            UploadDTO uploadDTO = uploadUtil.upload(m, path);
+
+            attachmentFileRepository.save(AttachmentFile.builder()
+                    .fileName(uploadDTO.getFileName())
+                    .filePath(path)
+                    .originalFileName(uploadDTO.getOriginalName())
+                    .thumbFileName(uploadDTO.getThumbFileName())
+                    .answerAttachment(buyInquiry.get())
+                    .build());
+
+        }
+
+        return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
+    }
 }
+
+//    Page<BuyInquiry> buyInquiries;
+//        buyInquiries = buyInquiryRepository.findAll(pageable);
+//                if(){
+//                buyInquiries = userRepository.findByCompanyName().get().
+//                }
 
 //        List<BuyInquiryStateDTO> buyInquiryStateDTOList;
 //

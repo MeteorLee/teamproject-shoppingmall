@@ -52,8 +52,8 @@ public class BuyInquiryController {
                                               BindingResult bindingResult, @RequestPart(required = false) List<MultipartFile> buyImageList) {
 
         return buyInquiryService.buyInquiryCreat(requestDTO, buyImageList, principal);
-
     }
+
     @Transactional
     @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
     @Operation(summary = "관리자 페이지(구매 문의 전체조회)", description = "관리자 페이지(구매 문의 전체조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
@@ -81,17 +81,18 @@ public class BuyInquiryController {
         return buyInquiryService.buyInquiryState(inquiryId, state);
     }
 
-//    @Transactional
-//    @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
-//    @Operation(summary = "관리자 페이지(구매문의 처리 상태변경)", description = "관리자 페이지(구매문의 처리 상태변경) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
-//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-//    })
-//    @PostMapping("/admin/buyInquiry/{inquiryId}")
-//    public ResponseEntity<?> buyInquiryFull(@PathVariable Long inquiryId, @RequestParam BuyInquiryState state){
-//        return buyInquiryService.buyInquiryState(inquiryId, state);
-//    }
+    @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
+    @Operation(summary = "관리자 페이지(구매문의 답변첨부파일)", description = "관리자 페이지(구매문의 답변첨부파일) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping(value = "/admin/buyInquiry/answerAttachment",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> buyInquiryAnswerAttachment (@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal, @RequestPart(value = "inquiryId") @Valid Long inquiryId,
+                                              BindingResult bindingResult, @RequestPart(required = false) List<MultipartFile> answerAttachmentList) {
+
+        return buyInquiryService.buyInquiryAnswerAttachment(inquiryId, answerAttachmentList);
+    }
 
 //    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
 //    @Operation(summary = "관리자 페이지(고객관리) 선택조회", description = "관리자 페이지(고객관리) 선택조회 메서드입니다.",
