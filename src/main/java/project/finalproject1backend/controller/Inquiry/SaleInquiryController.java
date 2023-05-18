@@ -18,20 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
 import project.finalproject1backend.dto.inquiry.SaleInquiryDTO;
-import project.finalproject1backend.service.Inquiry.BuyInquiryService;
 import project.finalproject1backend.service.Inquiry.SaleInquiryService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/account")
 @RestController
 public class SaleInquiryController {
 
@@ -43,7 +40,7 @@ public class SaleInquiryController {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    @PostMapping(value = "/account/saleInquiry/register",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/saleInquiry/register",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saleInquiryCreat (@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal, @RequestPart(value = "requestDTO") @Valid SaleInquiryDTO requestDTO,
                                               BindingResult bindingResult, @RequestPart(required = false) List<MultipartFile> saleAttachmentList) {
 

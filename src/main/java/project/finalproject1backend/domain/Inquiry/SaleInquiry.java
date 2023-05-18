@@ -1,5 +1,6 @@
 package project.finalproject1backend.domain.Inquiry;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -16,16 +17,14 @@ import java.util.Set;
 @ToString
 @Getter
 @Builder
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE user SET is_deleted = true, deleted_at=now() WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class SaleInquiry {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     private User saleInquiryId;
 

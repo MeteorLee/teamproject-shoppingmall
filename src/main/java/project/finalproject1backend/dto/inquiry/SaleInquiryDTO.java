@@ -1,11 +1,9 @@
 package project.finalproject1backend.dto.inquiry;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import project.finalproject1backend.domain.Inquiry.SaleInquiryState;
 
 @Builder
 @Data
@@ -28,3 +26,13 @@ public class SaleInquiryDTO {
     private String mallAddress;
 
 }
+/*
+”company” :“기업명”
+”companyAddress” : “본사 주소”
+”address” :”기본 주소”
+”detailsAddress” :“상세 주소”
+”manufacturer” :”제조사”
+”mall” :”자사 쇼핑몰 운영여부”
+”mallAddress” :”자사 쇼핑몰 주소”
+”saleAttachmentList” :”첨부파일”
+ */

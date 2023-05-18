@@ -1,5 +1,8 @@
 package project.finalproject1backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -11,9 +14,7 @@ import project.finalproject1backend.dto.product.ProductFormDto;
 import project.finalproject1backend.exception.OutOfStockException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Table(name="product")
 @ToString
@@ -75,22 +76,18 @@ public class Product extends AuditingFields{
     @ManyToOne(fetch = FetchType.LAZY)
     private SubCategory productSubcategory;  //중분류
 
-    //유저의 현황 관련
-    @OneToMany(mappedBy = "cartItems", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @Builder.Default
-    private List<Cart> carts = new ArrayList<>();
 
     //order 로 했다가 domain의 Order말고 다른 Order 들어가서 오류가 많이 나서 orders로 변경...
-    @OneToMany(mappedBy = "buyInquiryProduct", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "buyInquiryProduct", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
     @Builder.Default
-    private List<BuyInquiry> inquiries = new ArrayList<>();
-
-    @OneToMany(mappedBy = "productAttachment", cascade = CascadeType.ALL)
+    private Set<BuyInquiry> inquiries = new HashSet<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "productAttachment", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @ToString.Exclude
     @Builder.Default
-    private List<AttachmentFile> imgList = new ArrayList<>();
+    private Set<AttachmentFile> imgList = new HashSet<>();
 
 
     @Override

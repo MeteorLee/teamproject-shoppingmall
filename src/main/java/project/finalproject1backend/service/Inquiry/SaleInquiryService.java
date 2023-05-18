@@ -7,23 +7,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
-import project.finalproject1backend.domain.Inquiry.BuyInquiry;
 import project.finalproject1backend.domain.Inquiry.SaleInquiry;
+import project.finalproject1backend.domain.Inquiry.SaleInquiryState;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
-import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
 import project.finalproject1backend.dto.inquiry.SaleInquiryDTO;
 import project.finalproject1backend.repository.AttachmentFileRepository;
-import project.finalproject1backend.repository.Inquiry.BuyInquiryRepository;
 import project.finalproject1backend.repository.Inquiry.SaleInquiryRepository;
 import project.finalproject1backend.repository.UserRepository;
 import project.finalproject1backend.util.UploadUtil;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Transactional
@@ -48,8 +46,13 @@ public class SaleInquiryService {
         if (!user.isPresent()) {
             return new ResponseEntity<>(new ErrorDTO("400", "notExistId"), HttpStatus.BAD_REQUEST);
         }
+        String id = LocalDateTime.now().toString()+ UUID.randomUUID().toString().substring(1,5);
+        id.replace("-","_");
 
+        Set<SaleInquiryState> saleInquiryStates = new HashSet<>();
+        saleInquiryStates.add(SaleInquiryState.STATE_UNREAD);
         SaleInquiry saleInquiry = SaleInquiry.builder()
+                .id(id)
                 .saleInquiryId(user.get())
                 .company(requestDTO.getCompany())
                 .companyAddress(requestDTO.getCompanyAddress())
@@ -58,12 +61,14 @@ public class SaleInquiryService {
                 .manufacturer(requestDTO.getManufacturer())
                 .mall(requestDTO.isMall())
                 .mallAddress(requestDTO.getMallAddress())
+                .state(saleInquiryStates)
                 .build();
 
         saleInquiryRepository.save(saleInquiry);
 
         if (saleAttachmentList == null || saleAttachmentList.isEmpty()) {
-            throw new IllegalArgumentException("checkSaleAttachmentList");
+//            throw new IllegalArgumentException("checkSaleAttachmentList");
+            return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
         }
 
         for (MultipartFile m : saleAttachmentList) {

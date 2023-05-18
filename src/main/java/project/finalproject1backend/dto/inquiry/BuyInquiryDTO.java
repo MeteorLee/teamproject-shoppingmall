@@ -31,3 +31,13 @@ public class BuyInquiryDTO {
     private LocalDate deliveryWishDate;
 
 }
+/*
+”category” :”대량구매, 주문제작”
+”product” :”구매 희망 제품”
+”amount” :”구매 수량”
+”buyImageList” :”이미지 첨부파일”
+”answerAttachment” :”답변 첨부파일”
+”content” :”요청사항 작성”
+”estimateWishDate” :”견적 수령 희망일”
+”deliveryWishDate” :”제품 배송 희망일”
+ */
