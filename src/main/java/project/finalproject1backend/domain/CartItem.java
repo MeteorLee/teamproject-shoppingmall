@@ -1,6 +1,7 @@
 package project.finalproject1backend.domain;
 
 import lombok.*;
+import project.finalproject1backend.repository.cart.CartItemRepository;
 
 import javax.persistence.*;
 
@@ -13,7 +14,7 @@ import javax.persistence.*;
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="cart_id")
@@ -24,14 +25,6 @@ public class CartItem {
     private Product product;
 
     private int count;
-
-    public static CartItem createCartItem(Cart cart, Product product, int amount) {
-        CartItem cartItem = new CartItem();
-        cartItem.setCart(cart);
-        cartItem.setProduct(product);
-        cartItem.setCount(amount);
-        return cartItem;
-    }
 
 
 }
