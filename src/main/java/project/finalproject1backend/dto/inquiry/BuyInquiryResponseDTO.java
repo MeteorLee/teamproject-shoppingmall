@@ -45,7 +45,7 @@ public class BuyInquiryResponseDTO {
 
     @Getter
     @Setter
-    public class buyImageListInfo{
+    public static class buyImageListInfo{
         private String fileName;
         private String filePath;
         private String originalFileName;
