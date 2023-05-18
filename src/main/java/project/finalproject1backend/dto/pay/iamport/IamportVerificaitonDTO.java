@@ -14,14 +14,14 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class IamportVerificaitonDTO {
 
-    @NotBlank(message = "결제 오류")
-    private String imp_uid;
-    @NotBlank(message = "결제 오류")
-    private String merchant_uid;
-    @NotBlank(message = "결제 오류")
-    private int amount;
-    @NotBlank(message = "결제 오류")
-    @Email(message = "결제 오류")
-    private String buyer_email;
+    @NotBlank
+    private String imp_uid; // 고유 주문 번호
+    @NotBlank
+    private String merchant_uid; // 가맹점 주문 번호
+    @NotBlank
+    private int amount; // 총 금액
+    @NotBlank
+    @Email
+    private String buyer_email; // 주문자 이메일
 
 }

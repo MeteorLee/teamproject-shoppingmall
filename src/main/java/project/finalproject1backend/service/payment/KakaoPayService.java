@@ -122,10 +122,12 @@ public class KakaoPayService {
                 requestEntity,
                 KakaoCancelResponse.class);
 
+        // TODO: 2023-05-18 결제 취소 DB 반영 필요 
+
     }
 
     /**
-     * 카카오 요청 헤드
+     * 카카오 요청 header 생성
      *
      * @return
      */

@@ -5,17 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class IamportCallbackDTO {
+public class IamportCancelRequestDTO {
 
-    @NotBlank
-    private String imp_uid; // 고유 주문 번호
-    @NotBlank
     private String merchant_uid; // 가맹점 주문 번호
+    private int cancel_amount; // 취소 금액
 
 }
