@@ -11,13 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
+import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
 import project.finalproject1backend.domain.User;
+import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryResponseDTO;
+import project.finalproject1backend.dto.inquiry.BuyInquiryStateDTO;
+import project.finalproject1backend.dto.user.UsersInfoDTO;
 import project.finalproject1backend.repository.AttachmentFileRepository;
 import project.finalproject1backend.repository.Inquiry.BuyInquiryRepository;
 import project.finalproject1backend.repository.UserRepository;
@@ -33,21 +37,21 @@ public class BuyInquiryService {
 
     private final BuyInquiryRepository buyInquiryRepository;
 
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final AttachmentFileRepository attachmentFileRepository;
 
     private final UploadUtil uploadUtil;
 
-        private String path = "C:\\Users\\user\\Downloads\\my";  //로컬 테스트용
+    private String path = "C:\\Users\\user\\Downloads\\my";  //로컬 테스트용
 
 //    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
 
     public ResponseEntity<?> buyInquiryCreat(BuyInquiryDTO requestDTO, List<MultipartFile> buyImageList, PrincipalDTO principal) {
 
         Optional<User> user = userRepository.findByUserId(principal.getUserId());
-        if(!user.isPresent()){
-            return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(new ErrorDTO("400", "notExistId"), HttpStatus.BAD_REQUEST);
         }
 
         BuyInquiry buyInquiry = BuyInquiry.builder()
@@ -62,13 +66,13 @@ public class BuyInquiryService {
 
         buyInquiryRepository.save(buyInquiry);
 
-        if(buyImageList == null || buyImageList.isEmpty()){
+        if (buyImageList == null || buyImageList.isEmpty()) {
 //            throw new IllegalArgumentException("checkBuyImageList");
             return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
         }
 
-        for (MultipartFile m: buyImageList) {
-            UploadDTO uploadDTO = uploadUtil.upload(m,path);
+        for (MultipartFile m : buyImageList) {
+            UploadDTO uploadDTO = uploadUtil.upload(m, path);
 
             attachmentFileRepository.save(AttachmentFile.builder()
                     .fileName(uploadDTO.getFileName())
@@ -80,7 +84,7 @@ public class BuyInquiryService {
 
         }
 
-        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
     }
 
     public ResponseEntity<?> buyInquiryFull(Pageable pageable) {
@@ -89,7 +93,7 @@ public class BuyInquiryService {
 
         Page<BuyInquiry> buyInquiries = buyInquiryRepository.findAll(pageable);
 
-        for (BuyInquiry buyInquiry: buyInquiries) {
+        for (BuyInquiry buyInquiry : buyInquiries) {
 
             buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
                     .userId(buyInquiry.getBuyInquiryId().getUserId())
@@ -106,11 +110,50 @@ public class BuyInquiryService {
                     .state(buyInquiry.getState())
                     .build());
         }
-        int start = (int)pageable.getOffset();
+        int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), buyInquiryResponseDTOList.size());
         Page<BuyInquiryResponseDTO> page = new PageImpl<>(buyInquiryResponseDTOList.subList(start, end), pageable, buyInquiryResponseDTOList.size());
 
         return new ResponseEntity<>(buyInquiries, HttpStatus.OK);
 
     }
+
+    public ResponseEntity<?> buyInquiryState(Long inquiryId, BuyInquiryState state) {
+
+        state.getState();
+
+        Set<BuyInquiryState> states = new HashSet<>();
+
+        states.add(state);
+
+        Optional<BuyInquiry> buyInquiry = buyInquiryRepository.findById(inquiryId);
+
+        buyInquiry.get().setState(states);
+
+        buyInquiryRepository.save(buyInquiry.get());
+
+        return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
+    }
 }
+
+//        List<BuyInquiryStateDTO> buyInquiryStateDTOList;
+//
+//        if(inquiryId==null){
+//            buyInquiryStateDTOList=buyInquiryRepository.findAll().stream().map(BuyInquiryStateDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_UNREAD")){
+//            buyInquiryStateDTOList=buyInquiryRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_REGISTER")){
+//            buyInquiryStateDTOList=buyInquiryRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_SAMPLE")){
+//            buyInquiryStateDTOList=buyInquiryRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_APPROVAL")){
+//            buyInquiryStateDTOList=buyInquiryRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_REFUND")) {
+//            buyInquiryStateDTOList = buyInquiryRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_DELIVERY")) {
+//            buyInquiryStateDTOList = buyInquiryRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+//        }else if(inquiryId.equals("STATE_COMPLETED")){
+//            buyInquiryStateDTOList=buyInquiryRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
+//        }else {
+//            buyInquiryStateDTOList=buyInquiryRepository.findAll().stream().map(UsersInfoDTO::new).toList();
+//        }

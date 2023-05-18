@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
@@ -59,7 +60,7 @@ public class BuyInquiryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = BuyInquiryResponseDTO.class))),
     })
-    @GetMapping("/buyInquiry")
+    @GetMapping("/admin/buyInquiry")
     public ResponseEntity<?> buyInquiryFull(@Parameter(example = "{\n" +
             "  \"page\": 0,\n" +
             "  \"size\": 15,\n" +
@@ -68,15 +69,28 @@ public class BuyInquiryController {
         return buyInquiryService.buyInquiryFull(pageable);
     }
 
+    @Transactional
+    @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
+    @Operation(summary = "관리자 페이지(구매문의 처리 상태변경)", description = "관리자 페이지(구매문의 처리 상태변경) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+    })
+    @PostMapping("/admin/buyInquiry/{inquiryId}")
+    public ResponseEntity<?> buyInquiryState(@PathVariable Long inquiryId, @RequestParam BuyInquiryState state){
+        return buyInquiryService.buyInquiryState(inquiryId, state);
+    }
+
 //    @Transactional
 //    @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
-//    @Operation(summary = "관리자 페이지(구매문의 처리 상태조회)", description = "관리자 페이지(구매문의 처리 상태조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
+//    @Operation(summary = "관리자 페이지(구매문의 처리 상태변경)", description = "관리자 페이지(구매문의 처리 상태변경) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
 //    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = BuyInquiryResponseDTO.class))),
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
+//            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
 //    })
-//    @GetMapping("/buyInquiry")
-//    public ResponseEntity<?> buyInquiryFull( {
-//        return buyInquiryService.buyInquiryFull(pageable);
+//    @PostMapping("/admin/buyInquiry/{inquiryId}")
+//    public ResponseEntity<?> buyInquiryFull(@PathVariable Long inquiryId, @RequestParam BuyInquiryState state){
+//        return buyInquiryService.buyInquiryState(inquiryId, state);
 //    }
 
 //    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
