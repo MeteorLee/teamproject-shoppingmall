@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,14 +55,29 @@ public class BuyInquiryController {
     }
     @Transactional
     @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
-    @Operation(summary = "마이 페이지(구매 문의 조회)", description = "마이 페이지(구매 문의 조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
+    @Operation(summary = "관리자 페이지(구매 문의 전체조회)", description = "관리자 페이지(구매 문의 전체조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = BuyInquiryResponseDTO.class))),
     })
     @GetMapping("/buyInquiry")
-    public ResponseEntity<?> buyInquiryFull(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
-        return buyInquiryService.buyInquiryFull(principal);
+    public ResponseEntity<?> buyInquiryFull(@Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+        return buyInquiryService.buyInquiryFull(pageable);
     }
+
+//    @Transactional
+//    @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
+//    @Operation(summary = "관리자 페이지(구매문의 처리 상태조회)", description = "관리자 페이지(구매문의 처리 상태조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = BuyInquiryResponseDTO.class))),
+//    })
+//    @GetMapping("/buyInquiry")
+//    public ResponseEntity<?> buyInquiryFull( {
+//        return buyInquiryService.buyInquiryFull(pageable);
+//    }
 
 //    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
 //    @Operation(summary = "관리자 페이지(고객관리) 선택조회", description = "관리자 페이지(고객관리) 선택조회 메서드입니다.",

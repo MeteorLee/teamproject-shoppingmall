@@ -1,6 +1,9 @@
 package project.finalproject1backend.service.Inquiry;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -80,19 +83,19 @@ public class BuyInquiryService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> buyInquiryFull(PrincipalDTO principal) {
+    public ResponseEntity<?> buyInquiryFull(Pageable pageable) {
 
         List<BuyInquiryResponseDTO> buyInquiryResponseDTOList = new ArrayList<>();
 
-//        if(!(principal.getBuyInquiry().iterator().next().==null||principal.getBusinessLicense().isEmpty())) {
-//        }
-        for (BuyInquiry buyInquiry:principal.getBuyInquiry()) {
+        Page<BuyInquiry> buyInquiries = buyInquiryRepository.findAll(pageable);
+
+        for (BuyInquiry buyInquiry: buyInquiries) {
 
             buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
-                    .userId(principal.getUserId())
-                    .email(principal.getEmail())
-                    .phoneNumber(principal.getPhoneNumber())
-                    .companyName(principal.getCompanyName())
+                    .userId(buyInquiry.getBuyInquiryId().getUserId())
+                    .email(buyInquiry.getBuyInquiryId().getEmail())
+                    .phoneNumber(buyInquiry.getBuyInquiryId().getPhoneNumber())
+                    .companyName(buyInquiry.getBuyInquiryId().getCompanyName())
                     .category(buyInquiry.getCategory())
                     .product(buyInquiry.getProduct())
                     .amount(buyInquiry.getAmount())
@@ -103,12 +106,11 @@ public class BuyInquiryService {
                     .state(buyInquiry.getState())
                     .build());
         }
+        int start = (int)pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), buyInquiryResponseDTOList.size());
+        Page<BuyInquiryResponseDTO> page = new PageImpl<>(buyInquiryResponseDTOList.subList(start, end), pageable, buyInquiryResponseDTOList.size());
 
-        return new ResponseEntity<>(buyInquiryResponseDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(buyInquiries, HttpStatus.OK);
+
     }
-
-
-//    public ResponseEntity<?> getUserInfo(String userId) {
-//        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);
-//    }
 }
