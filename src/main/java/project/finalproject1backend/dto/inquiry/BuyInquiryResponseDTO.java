@@ -1,13 +1,11 @@
 package project.finalproject1backend.dto.inquiry;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
 import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
 import project.finalproject1backend.dto.PrincipalDTO;
+import project.finalproject1backend.dto.UploadDTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,7 +33,7 @@ public class BuyInquiryResponseDTO {
 
     private int amount;
 
-    private Set<AttachmentFile> buyImageList = new HashSet<>();
+    private List<buyImageListInfo> buyImageList = new ArrayList<>();
 
     private String content;
 
@@ -44,6 +42,20 @@ public class BuyInquiryResponseDTO {
     private LocalDate deliveryWishDate;
 
     private Set<BuyInquiryState> state = new HashSet<>();
+
+    @Getter
+    @Setter
+    public class buyImageListInfo{
+        private String fileName;
+        private String filePath;
+        private String originalFileName;
+
+        public buyImageListInfo(AttachmentFile a) {
+            this.fileName = a.getFileName();
+            this.filePath = a.getFilePath();
+            this.originalFileName = a.getOriginalFileName();
+        }
+    }
 
 //    private List<BuyInquiry> buyInquiry;
 

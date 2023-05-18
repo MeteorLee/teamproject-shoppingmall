@@ -3,15 +3,11 @@ package project.finalproject1backend.service.Inquiry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
-import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
-import project.finalproject1backend.domain.SubCategory;
 import project.finalproject1backend.domain.User;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
@@ -19,16 +15,13 @@ import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryResponseDTO;
-import project.finalproject1backend.dto.user.UserInfoResponseDTO;
-import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
-import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.AttachmentFileRepository;
 import project.finalproject1backend.repository.Inquiry.BuyInquiryRepository;
 import project.finalproject1backend.repository.UserRepository;
 import project.finalproject1backend.util.UploadUtil;
 
-import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -91,7 +84,15 @@ public class BuyInquiryService {
 
         List<BuyInquiryResponseDTO> buyInquiryResponseDTOList = new ArrayList<>();
 
+//        if(!(principal.getBuyInquiry().iterator().next().==null||principal.getBusinessLicense().isEmpty())) {
+//        }
         for (BuyInquiry buyInquiry:principal.getBuyInquiry()) {
+            List<BuyInquiryResponseDTO.buyImageListInfo> imageListInfo = new ArrayList<>();
+            for (AttachmentFile a:buyInquiry.getBuyImageList()) {
+                imageListInfo.add(new BuyInquiryResponseDTO.buyImageListInfo(a));
+            }
+//                    buyInquiry.getBuyImageList().stream().map(BuyInquiryResponseDTO.buyImageListInfo::new).collect(Collectors.toList();
+
             buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
                     .userId(principal.getUserId())
                     .email(principal.getEmail())
@@ -100,7 +101,7 @@ public class BuyInquiryService {
                     .category(buyInquiry.getCategory())
                     .product(buyInquiry.getProduct())
                     .amount(buyInquiry.getAmount())
-                    .buyImageList(buyInquiry.getBuyImageList())
+                    .buyImageList(imageListInfo)
                     .content(buyInquiry.getContent())
                     .estimateWishDate(buyInquiry.getEstimateWishDate())
                     .deliveryWishDate(buyInquiry.getDeliveryWishDate())
@@ -111,6 +112,10 @@ public class BuyInquiryService {
         return new ResponseEntity<>(buyInquiryResponseDTOList, HttpStatus.OK);
 //        return new ResponseEntity<>(principal.getBuyInquiry(), HttpStatus.OK);
     }
+    if(!(u.getBusinessLicense()==null||u.getBusinessLicense().isEmpty())){
+        this.businessLicense = u.getBusinessLicense().stream().map(businessLicenseInfo::new).collect(Collectors.toList());
+    }
+
 //    public ResponseEntity<?> getUserInfo(String userId) {
 //        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);
 //    }
