@@ -8,6 +8,7 @@ import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.PrincipalDTO;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class UserInfoResponseDTO {
     private LocalDate openingDate;
     private String corporateNumber;
     private List<businessLicenseInfo> businessLicense;
-//    private List<AttachmentFile> businessLicense;
+    private List<businessLicenseInfo> additionalData;
     private String managerName;
     private String phoneNumber;
     private String email;
@@ -36,14 +37,14 @@ public class UserInfoResponseDTO {
         private String filePath;
         private String originalFileName;
 
-        public businessLicenseInfo(AttachmentFile a) {
+        private businessLicenseInfo(AttachmentFile a) {
             this.fileName = a.getFileName();
             this.filePath = a.getFilePath();
             this.originalFileName = a.getOriginalFileName();
         }
     }
 
-    public UserInfoResponseDTO(PrincipalDTO dto) {
+    public UserInfoResponseDTO(PrincipalDTO dto ,List<businessLicenseInfo> additionalData ) {
         this.userId = dto.getUserId();
         this.companyName=dto.getCompanyName();
         this.ownerName = dto.getOwnerName();
@@ -52,13 +53,14 @@ public class UserInfoResponseDTO {
         if(!(dto.getBusinessLicense()==null||dto.getBusinessLicense().isEmpty())){
             this.businessLicense = dto.getBusinessLicense().stream().map(businessLicenseInfo::new).collect(Collectors.toList());
         }
+        this.additionalData = additionalData;
 //        this.businessLicense = dto.getBusinessLicense();
         this.managerName = dto.getManagerName();
         this.phoneNumber = dto.getPhoneNumber();
         this.email = dto.getEmail();
         this.role = dto.getRole().iterator().next();
     }
-    public UserInfoResponseDTO(User u) {
+    public UserInfoResponseDTO(User u,List<businessLicenseInfo> additionalData ) {
         this.userId = u.getUserId();
         this.companyName=u.getCompanyName();
         this.ownerName = u.getOwnerName();
@@ -67,26 +69,20 @@ public class UserInfoResponseDTO {
         if(!(u.getBusinessLicense()==null||u.getBusinessLicense().isEmpty())){
             this.businessLicense = u.getBusinessLicense().stream().map(businessLicenseInfo::new).collect(Collectors.toList());
         }
+        this.additionalData = additionalData;
 //        this.businessLicense = u.getBusinessLicense();
         this.managerName = u.getManagerName();
         this.phoneNumber = u.getPhoneNumber();
         this.email = u.getEmail();
         this.role = u.getRole().iterator().next();
     }
-//    public static UserInfoResponseDTO from(User user){
-//        return UserInfoResponseDTO.builder()
-//                .userId(user.getUserId())
-//                .companyName(user.getCompanyName())
-//                .ownerName(user.getOwnerName())
-//                .openingDate(user.getOpeningDate())
-//                .corporateNumber(user.getCorporateNumber())
-//                .businessLicense(user.getBusinessLicense().stream().map(businessLicenseInfo::new).collect(Collectors.toList()))
-//                .managerName(user.getManagerName())
-//                .phoneNumber(user.getPhoneNumber())
-//                .email(user.getEmail())
-//                .role(user.getRole().iterator().next())
-//                .build();
-//    }
+    public UserInfoResponseDTO from(User u, List<AttachmentFile> additionalData){
+        List<businessLicenseInfo> list = new ArrayList<>();
+        for (AttachmentFile a:additionalData) {
+            list.add(new businessLicenseInfo(a));
+        }
+        return new UserInfoResponseDTO(u,list);
+    }
 }
 /*
 {
