@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import project.finalproject1backend.dto.ErrorDTO;
+import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.pay.PaymentResponseDTO;
 import project.finalproject1backend.exception.PaymentException;
 
@@ -40,8 +41,8 @@ public class ControllerAdvice {
      * @return
      */
     @ExceptionHandler(PaymentException.class)
-    public PaymentResponseDTO PaymentExceptionHandler() {
+    public ResponseEntity<ResponseDTO> PaymentExceptionHandler() {
 
-        return new PaymentResponseDTO("결제 오류");
+        return new ResponseEntity<>(new ResponseDTO("400","fail"), HttpStatus.OK);
     }
 }

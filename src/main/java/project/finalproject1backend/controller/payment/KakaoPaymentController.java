@@ -1,11 +1,15 @@
 package project.finalproject1backend.controller.payment;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.finalproject1backend.dto.pay.PaymentResponseDTO;
-import project.finalproject1backend.dto.pay.kakao.KakaoApproveResponse;
-import project.finalproject1backend.dto.pay.kakao.KakaoReadyResponse;
+import project.finalproject1backend.dto.ResponseDTO;
+import project.finalproject1backend.dto.pay.kakao.*;
 import project.finalproject1backend.service.payment.KakaoPayService;
+
+import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +24,9 @@ public class KakaoPaymentController {
      * @return
      */
     @PostMapping("/ready")
-    public KakaoReadyResponse readyToKakaoPay() {
+    public KakaoReadyResponse readyToKakaoPay(@Valid KakaoPayRequsetDTO requsetDTO) {
 
-        return kakaoPayService.kakaoPayReady();
+        return kakaoPayService.kakaoPayReady(requsetDTO);
     }
 
     /**
@@ -32,11 +36,11 @@ public class KakaoPaymentController {
      * @return
      */
     @GetMapping("/success")
-    public PaymentResponseDTO afterPayRequest(@RequestParam("pg_token") String pgToken) {
+    public ResponseEntity<ResponseDTO> afterPayRequest(@RequestParam("pg_token") String pgToken) {
 
-        KakaoApproveResponse kakaoApprove = kakaoPayService.approveResponse(pgToken);
+        kakaoPayService.approveResponse(pgToken);
 
-        return new PaymentResponseDTO("결제 성공");
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
     /**
@@ -45,9 +49,9 @@ public class KakaoPaymentController {
      * @return
      */
     @GetMapping("/cancel")
-    public PaymentResponseDTO cancel() {
+    public ResponseEntity<ResponseDTO> cancel() {
 
-        return new PaymentResponseDTO("결제 취소");
+        return new ResponseEntity<>(new ResponseDTO("400","fail"), HttpStatus.OK);
     }
 
     /**
@@ -56,9 +60,22 @@ public class KakaoPaymentController {
      * @return
      */
     @GetMapping("/fail")
-    public PaymentResponseDTO fail() {
+    public ResponseEntity<ResponseDTO> fail() {
 
-        return new PaymentResponseDTO("결제 실패");
+        return new ResponseEntity<>(new ResponseDTO("400","fail"), HttpStatus.OK);
+    }
+
+    /**
+     * 결제 환불
+     *
+     * @return
+     */
+    @PostMapping("/refund")
+    public ResponseEntity<ResponseDTO> refund(KakaoCancelRequestDTO requestDTO, Principal principal) {
+
+        kakaoPayService.kakaoCancel(requestDTO);
+
+        return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
     }
 
 
