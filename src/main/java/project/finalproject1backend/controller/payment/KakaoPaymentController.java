@@ -24,7 +24,7 @@ public class KakaoPaymentController {
      * @return
      */
     @PostMapping("/ready")
-    public KakaoReadyResponse readyToKakaoPay(@Valid KakaoPayRequsetDTO requsetDTO) {
+    public KakaoReadyResponse readyToKakaoPay(@RequestBody @Valid KakaoPayRequsetDTO requsetDTO) {
 
         return kakaoPayService.kakaoPayReady(requsetDTO);
     }
@@ -71,7 +71,7 @@ public class KakaoPaymentController {
      * @return
      */
     @PostMapping("/refund")
-    public ResponseEntity<ResponseDTO> refund(KakaoCancelRequestDTO requestDTO, Principal principal) {
+    public ResponseEntity<ResponseDTO> refund(@RequestBody @Valid KakaoCancelRequestDTO requestDTO, Principal principal) {
 
         kakaoPayService.kakaoCancel(requestDTO);
 
