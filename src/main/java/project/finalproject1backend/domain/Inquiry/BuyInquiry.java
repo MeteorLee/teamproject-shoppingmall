@@ -1,5 +1,6 @@
 package project.finalproject1backend.domain.Inquiry;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -29,6 +30,7 @@ public class BuyInquiry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     private User buyInquiryId;
 

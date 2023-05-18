@@ -10,19 +10,25 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
+import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
+import project.finalproject1backend.domain.SubCategory;
 import project.finalproject1backend.domain.User;
+import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.UploadDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
+import project.finalproject1backend.dto.inquiry.BuyInquiryResponseDTO;
+import project.finalproject1backend.dto.user.UserInfoResponseDTO;
+import project.finalproject1backend.dto.user.UserSignUpRequestDTO;
 import project.finalproject1backend.jwt.JwtTokenProvider;
 import project.finalproject1backend.repository.AttachmentFileRepository;
 import project.finalproject1backend.repository.Inquiry.BuyInquiryRepository;
 import project.finalproject1backend.repository.UserRepository;
 import project.finalproject1backend.util.UploadUtil;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 @Transactional
@@ -44,6 +50,9 @@ public class BuyInquiryService {
     public ResponseEntity<?> buyInquiryCreat(BuyInquiryDTO requestDTO, List<MultipartFile> buyImageList, PrincipalDTO principal) {
 
         Optional<User> user = userRepository.findByUserId(principal.getUserId());
+        if(!user.isPresent()){
+            return new ResponseEntity<>(new ErrorDTO("400","notExistId"), HttpStatus.BAD_REQUEST);
+        }
 
         BuyInquiry buyInquiry = BuyInquiry.builder()
                 .buyInquiryId(user.get())
@@ -56,6 +65,11 @@ public class BuyInquiryService {
                 .build();
 
         buyInquiryRepository.save(buyInquiry);
+
+        if(buyImageList == null || buyImageList.isEmpty()){
+//            throw new IllegalArgumentException("checkBuyImageList");
+            return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
+        }
 
         for (MultipartFile m: buyImageList) {
             UploadDTO uploadDTO = uploadUtil.upload(m,path);
@@ -73,14 +87,31 @@ public class BuyInquiryService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-//    public ResponseEntity<?> BuyInquiry(BuyInquiryDTO buyInquiryDTO) {
-//
-//        if(buyInquiryRepository.existsByUserId(buyInquiryDTO.getUserId())) {
-//            throw new IllegalArgumentException("existId");
-////            return new ResponseEntity<>(new ErrorDTO("400","existId"), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> buyInquiryFull(PrincipalDTO principal) {
+
+        List<BuyInquiryResponseDTO> buyInquiryResponseDTOList = new ArrayList<>();
+
+//        for (BuyInquiry buyInquiry:principal.getBuyInquiry()) {
+//            buyInquiryResponseDTOList.add(BuyInquiryResponseDTO.builder()
+//                    .userId(principal.getUserId())
+//                    .email(principal.getEmail())
+//                    .phoneNumber(principal.getPhoneNumber())
+//                    .companyName(principal.getCompanyName())
+//                    .category(buyInquiry.getCategory())
+//                    .product(buyInquiry.getProduct())
+//                    .amount(buyInquiry.getAmount())
+//                    .buyImageList(buyInquiry.getBuyImageList())
+//                    .content(buyInquiry.getContent())
+//                    .estimateWishDate(buyInquiry.getEstimateWishDate())
+//                    .deliveryWishDate(buyInquiry.getDeliveryWishDate())
+//                    .state(buyInquiry.getState())
+//                    .build());
 //        }
-//        Optional<User> user = buyInquiryRepository.findByUserId(buyInquiryDTO.getUserId());
-//
-//        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+
+//        return new ResponseEntity<>(buyInquiryResponseDTOList, HttpStatus.OK);
+        return new ResponseEntity<>(principal.getBuyInquiry(), HttpStatus.OK);
+    }
+//    public ResponseEntity<?> getUserInfo(String userId) {
+//        return new ResponseEntity<>(userRepository.findByUserId(userId).map(UserInfoResponseDTO::new), HttpStatus.OK);
 //    }
 }
