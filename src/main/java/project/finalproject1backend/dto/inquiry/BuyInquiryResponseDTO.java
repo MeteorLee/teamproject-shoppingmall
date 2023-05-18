@@ -4,8 +4,6 @@ import lombok.*;
 import project.finalproject1backend.domain.AttachmentFile;
 import project.finalproject1backend.domain.Inquiry.BuyInquiry;
 import project.finalproject1backend.domain.Inquiry.BuyInquiryState;
-import project.finalproject1backend.dto.PrincipalDTO;
-import project.finalproject1backend.dto.UploadDTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,11 +39,11 @@ public class BuyInquiryResponseDTO {
 
     private LocalDate deliveryWishDate;
 
-    private Set<BuyInquiryState> state = new HashSet<>();
+    private BuyInquiryState state;
 
     @Getter
     @Setter
-    public static class buyImageListInfo{
+    private class buyImageListInfo{
         private String fileName;
         private String filePath;
         private String originalFileName;
@@ -57,24 +55,22 @@ public class BuyInquiryResponseDTO {
         }
     }
 
-//    private List<BuyInquiry> buyInquiry;
-
-
-
-//    public BuyInquiryResponseDTO(PrincipalDTO dto) {
-//        this.userId = dto.getUserId();
-//        this.email = dto.getEmail();
-//        this.phoneNumber = dto.getPhoneNumber();
-//        this.companyName = dto.getCompanyName();
-//        category = dto.getBuyInquiry().g;
-//        this.product = dto.pro;
-//        this.amount = dto.;
-//        this.buyImageList = buyImageList;
-//        this.content = content;
-//        this.estimateWishDate = estimateWishDate;
-//        this.deliveryWishDate = deliveryWishDate;
-//        this.state = state;
-//    }
+    public BuyInquiryResponseDTO(BuyInquiry b) {
+        this.userId = b.getBuyInquiryId().getUserId();
+        this.email = b.getBuyInquiryId().getEmail();
+        this.phoneNumber = b.getBuyInquiryId().getPhoneNumber();
+        this.companyName = b.getBuyInquiryId().getCompanyName();
+        this.category = b.getCategory();
+        this.product = b.getProduct();
+        this.amount = b.getAmount();
+        if(!(b.getBuyImageList()==null||b.getBuyImageList().isEmpty())) {
+            this.buyImageList = b.getBuyImageList().stream().map(BuyInquiryResponseDTO.buyImageListInfo::new).toList();
+        }
+        this.content = b.getContent();
+        this.estimateWishDate = b.getEstimateWishDate();
+        this.deliveryWishDate = b.getDeliveryWishDate();
+        this.state = b.getState().iterator().next();
+    }
 }
 /*
 => 견적문의 전체조회 api

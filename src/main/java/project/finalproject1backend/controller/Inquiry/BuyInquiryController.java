@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,8 +26,6 @@ import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryDTO;
 import project.finalproject1backend.dto.inquiry.BuyInquiryResponseDTO;
-import project.finalproject1backend.dto.product.ProductFormDto;
-import project.finalproject1backend.dto.user.UserInfoResponseDTO;
 import project.finalproject1backend.service.Inquiry.BuyInquiryService;
 
 import javax.validation.Valid;
@@ -65,8 +62,8 @@ public class BuyInquiryController {
             "  \"page\": 0,\n" +
             "  \"size\": 15,\n" +
             "  \"sort\" : \"id\"\n" +
-            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        return buyInquiryService.buyInquiryFull(pageable);
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,@RequestParam(required = false) String type,@RequestParam(required = false) String search) {
+        return buyInquiryService.buyInquiryFull(pageable,type,search);
     }
 
     @Transactional
