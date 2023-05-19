@@ -1,12 +1,15 @@
 package project.finalproject1backend.controller.payment;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.finalproject1backend.dto.PrincipalDTO;
 import project.finalproject1backend.dto.ResponseDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportCallbackDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportCancelRequestDTO;
@@ -14,7 +17,6 @@ import project.finalproject1backend.dto.pay.iamport.IamportVerificaitonDTO;
 import project.finalproject1backend.service.payment.IamportPayService;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,10 +33,11 @@ public class IamportPaymentController {
      * @return
      */
     @PostMapping("/callback")
-    public ResponseEntity<ResponseDTO> callback(@RequestBody @Valid IamportCallbackDTO requestDTO, Principal principal) {
+    public ResponseEntity<ResponseDTO> callback(@RequestBody @Valid IamportCallbackDTO requestDTO,
+                                                @Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
 
         // 유저 검증
-        iamportPayService.verifyEmail(principal.getName(), requestDTO.getMerchant_uid());
+        iamportPayService.verifyEmail(principal.getEmail(), requestDTO.getMerchant_uid());
 
         // 주문 번호 검증
         iamportPayService.verifyUid(requestDTO.getImp_uid());
@@ -53,10 +56,10 @@ public class IamportPaymentController {
      */
     @PostMapping("/verify")
     public ResponseEntity<ResponseDTO> verify(@RequestBody @Valid IamportVerificaitonDTO requestDTO,
-                                              Principal principal) {
+                                              @Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
 
         // 유저 검증
-        iamportPayService.verifyEmail(principal.getName(), requestDTO.getMerchant_uid());
+        iamportPayService.verifyEmail(principal.getEmail(), requestDTO.getMerchant_uid());
 
         // 금액 검증
         iamportPayService.verifyAmount(requestDTO.getAmount(), requestDTO.getImp_uid());
@@ -66,17 +69,17 @@ public class IamportPaymentController {
 
     /**
      * 결제 환불
-     * 
+     *
      * @param requestDTO
      * @param principal
      * @return
      */
     @PostMapping("/refund")
     public ResponseEntity<ResponseDTO> refund(@RequestBody @Valid IamportCancelRequestDTO requestDTO,
-                                              Principal principal) {
+                                              @Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal) {
 
         // 유저 검증
-        iamportPayService.verifyEmail(principal.getName(), requestDTO.getMerchant_uid());
+        iamportPayService.verifyEmail(principal.getEmail(), requestDTO.getMerchant_uid());
 
         // 환불
         iamportPayService.cancelAmount(requestDTO);
