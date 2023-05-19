@@ -64,6 +64,13 @@ public class IamportPaymentController {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
+    /**
+     * 결제 환불
+     * 
+     * @param requestDTO
+     * @param principal
+     * @return
+     */
     @PostMapping("/refund")
     public ResponseEntity<ResponseDTO> refund(@RequestBody @Valid IamportCancelRequestDTO requestDTO,
                                               Principal principal) {

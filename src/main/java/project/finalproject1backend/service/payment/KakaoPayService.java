@@ -8,12 +8,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import project.finalproject1backend.domain.OrderStatus;
+import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.dto.pay.kakao.*;
+import project.finalproject1backend.exception.PaymentException;
+import project.finalproject1backend.repository.OrderRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class KakaoPayService {
+
+    private final OrderRepository orderRepository;
 
     static final String cid = "TC0ONETIME"; // 가맹점 테스트 코드
     static final String admin_Key = "54d374f18f8a15516b5fa7b6930c2640"; // ADMIN 키
@@ -27,18 +35,23 @@ public class KakaoPayService {
 
         // 카카오페이 요청 양식
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-        parameters.add("cid", cid);
+
+        Orders order = this.getOrdersByPartnerOrderId(requsetDTO.getPartner_order_id());
 
         // 서버와 주고 받을 정보
-        parameters.add("partner_order_id", requsetDTO.getPartner_order_id());
-        parameters.add("partner_user_id", requsetDTO.getPartner_user_id());
-        parameters.add("item_name", requsetDTO.getItem_name());
-        parameters.add("quantity", String.valueOf(requsetDTO.getQuantity()));
-        parameters.add("total_amount", String.valueOf(requsetDTO.getTotal_amount()));
-        
-//        parameters.add("vat_amount", "0"); // 상품 부가세 금액 필수 아님
-        
+        parameters.add("cid", cid);
+        parameters.add("partner_order_id", String.valueOf(order.getNumber()));
+        parameters.add("partner_user_id", order.getUser().getEmail());
+        parameters.add("total_amount", String.valueOf(order.getTotalPrice()));
+
+        // TODO: 2023-05-19 아이템 이름, 갯수 작업 추후 필요
+        parameters.add("item_name", "아이템 이름");
+        parameters.add("quantity", "5"); // 아이템 갯수
+
+        // 부가세, 비과세 금액으로 현재는 0으로 설정
         parameters.add("tax_free_amount", "0"); // 상품 비과세 금액 일단 0으로 설정
+//        parameters.add("vat_amount", "0"); // 상품 부가세 금액 필수 아님, 없으면 0 설정
+        
         // TODO: 2023-05-12 url 잘 작동하는 지 확인 필요
         parameters.add("approval_url", "http://52.78.88.121:8080/account/pay/kakao/success"); // 성공 시 redirect url
         parameters.add("cancel_url", "http://52.78.88.121:8080/account/pay/kakao/cancel"); // 취소 시 redirect url
@@ -55,7 +68,10 @@ public class KakaoPayService {
                 requestEntity,
                 KakaoReadyResponse.class);
 
-        // TODO: 2023-05-19 DB 접근 여부
+        // pg사 주문 번호 db 저장
+        order.setPgUid(response.getTid());
+        // db 반영
+        orderRepository.save(order);
 
         return response;
     }
@@ -66,16 +82,20 @@ public class KakaoPayService {
      * @param pgToken
      * @return
      */
-    public void approveResponse(String pgToken) {
+    public void approveResponse(String pgToken, String partner_order_id) {
 
         // 카카오 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
         // TODO: 2023-05-19 tid 주고 받는 방식 결정
-        parameters.add("tid", "tid");
 
-        parameters.add("partner_order_id", "가맹점 주문 번호");
-        parameters.add("partner_user_id", "가맹점 회원 ID");
+        // DB 접근하여 주문 정보 가져오기
+        Orders orders = this.getOrdersByPartnerOrderId(partner_order_id);
+
+        parameters.add("tid", orders.getPgUid());
+
+        parameters.add("partner_order_id", String.valueOf(orders.getNumber()));
+        parameters.add("partner_user_id", orders.getUser().getEmail());
         parameters.add("pg_token", pgToken);
 
         // 파라미터, 헤더
@@ -89,7 +109,9 @@ public class KakaoPayService {
                 requestEntity,
                 KakaoApproveResponse.class);
 
-        // TODO: 2023-05-18 결제 완료 DB 작업 필요
+        orders.setStatus(OrderStatus.PURCHASED);
+        orderRepository.save(orders);
+        // TODO: 2023-05-19 재고 관련 로직이 필요한지 아직 모름
 
     }
 
@@ -100,14 +122,19 @@ public class KakaoPayService {
      */
     public void kakaoCancel(KakaoCancelRequestDTO requestDTO) {
 
+        // DB 접근하여 주문 정보 가져오기
+        Orders orders = this.getOrdersByPartnerOrderId(requestDTO.getPartner_order_id());
+
         // 카카오페이 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
-        // TODO: 2023-05-18 결제 고유 번호 확인 + 찾아서 넣기
-        parameters.add("tid", "환불할 결제 고유 번호");
+        parameters.add("tid", orders.getPgUid());
 
-        // TODO: 2023-05-18 결제 금액보다 환불금액이 큰지 확인해야함
         int cancelAmount = requestDTO.getCancel_amount();
+        int totalAmount = orders.getTotalPrice();
+        if (cancelAmount > totalAmount) {
+            throw new PaymentException();
+        }
 
         parameters.add("cancel_amount", String.valueOf(requestDTO.getCancel_amount()));
 
@@ -125,8 +152,8 @@ public class KakaoPayService {
                 requestEntity,
                 KakaoCancelResponse.class);
 
-        // TODO: 2023-05-18 결제 취소 DB 반영 필요 
-
+        orders.setTotalPrice(totalAmount - cancelAmount);
+        orderRepository.save(orders);
     }
 
     /**
@@ -145,4 +172,19 @@ public class KakaoPayService {
         return httpHeaders;
     }
 
+    // TODO: 2023-05-19 주문 당사자와 DB 주문자가 같은지 확인하는 로직 필요(진짜 필요한가? Security에서 일단 확인은 해줌)
+
+    /**
+     * 주문 번호를 이용하여 DB의 주문 테이블 정보 얻기
+     * 
+     * @param partner_order_id
+     * @return
+     */
+    private Orders getOrdersByPartnerOrderId(String partner_order_id) {
+        // DB 접근하여 주문 정보 가져오기
+
+        Optional<Orders> result = orderRepository.findByNumber(partner_order_id);
+        return result.orElseThrow(PaymentException::new);
+
+    }
 }

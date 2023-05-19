@@ -15,16 +15,10 @@ import javax.validation.constraints.NotBlank;
 public class KakaoPayRequsetDTO {
 
     @NotBlank
-    private String partner_order_id;
-    @NotBlank
-    private String partner_user_id;
-    @NotBlank
-    private String item_name;
-    @NotBlank
+    private String partner_order_id; // 가맹점 주문 번호
     @Min(1)
-    private int quantity;
-    @Min(1)
-    private int total_amount;
+    private int total_amount; // 상품 총액
+
     // TODO: 2023-05-19 product 정보 추가 필요
 
 }
