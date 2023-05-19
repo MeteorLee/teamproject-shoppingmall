@@ -99,42 +99,26 @@ public class UserService {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> modify(PrincipalDTO principal, ModifyRequestDTO modifyRequestDTO) {
-        if(modifyRequestDTO.content==null){
-            throw new IllegalArgumentException("checkContent");
-//            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> modify(PrincipalDTO principal, UserModifyRequestDTO modifyRequestDTO) {
+        Optional<User> user = userRepository.findByUserId(principal.getUserId());
+        String password = modifyRequestDTO.getPassword();
+        String email = modifyRequestDTO.getEmail();
+        String managerName = modifyRequestDTO.getManagerName();
+        String phoneNumber = modifyRequestDTO.getPhoneNumber();
+        if (!(password ==null)){
+            user.get().setPassword(passwordEncoder.encode(password));
         }
-        String[] contents = {"password","phoneNumber","managerName","email","companyName"};
-        int count =0;
-        for (String s:contents) {
-            if(s.equals(modifyRequestDTO.content)){
-                count++;
-            }
+        if(!(email==null)){
+            user.get().setEmail(email);
         }
-        if(count==0){
-            throw new IllegalArgumentException("checkContent");
-//            return new ResponseEntity<>(new ErrorDTO("400","checkContent"), HttpStatus.BAD_REQUEST);
+        if (!(managerName==null)){
+            user.get().setManagerName(managerName);
         }
-        Optional<User> user=userRepository.findById(principal.getId());
-        switch (modifyRequestDTO.content){
-            case "password":
-                user.get().setPassword(passwordEncoder.encode(modifyRequestDTO.value));
-                break;
-            case "phoneNumber":
-                user.get().setPhoneNumber(modifyRequestDTO.value);
-                break;
-            case "managerName":
-                user.get().setManagerName(modifyRequestDTO.value);
-                break;
-            case "email":
-                user.get().setEmail(modifyRequestDTO.value);
-                break;
-            case "companyName":
-                user.get().setCompanyName(modifyRequestDTO.value);
-                break;
+        if(!(phoneNumber==null)){
+            user.get().setPhoneNumber(phoneNumber);
         }
         userRepository.save(user.get());
-        return new ResponseEntity<>(modifyRequestDTO, HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
 
