@@ -177,40 +177,25 @@ public class UserService {
 //    public ResponseEntity<?> getUsers(Pageable pageable,String select,String value) {
     public ResponseEntity<?> getUsers(Pageable pageable, String select, String value) {
         // list로 주기
-        Page<UsersInfoDTO> userPage = null;
-        if(select==null){
-//            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
-            userPage = userRepository.findAll(pageable).map(UsersInfoDTO::new);
-        }else if(select.equals("ROLE_USER")){
-//            userList=userRepository.findByRole(UserRole.ROLE_USER).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByRole(UserRole.ROLE_USER,pageable).map(UsersInfoDTO::new);
-        }else if(select.equals("ROLE_STANDBY")){
-//            userList=userRepository.findByRole(UserRole.ROLE_STANDBY).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByRole(UserRole.ROLE_STANDBY,pageable).map(UsersInfoDTO::new);
-        }else if(select.equals("ROLE_REFUSE")){
-//            userList=userRepository.findByRole(UserRole.ROLE_REFUSE).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByRole(UserRole.ROLE_REFUSE,pageable).map(UsersInfoDTO::new);
+        Page<UserInfoResponseDTO> userPage = null;
+        if(select==null) {
+            userPage = userRepository.findAll(pageable).map(
+                    user -> new UserInfoResponseDTO().from(user, attachmentFileRepository.findByUserAdditionalData(user)));
         }else if(select.equals("업체명")){
-//            userList=userRepository.findByCompanyName(value).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByCompanyName(value,pageable).map(UsersInfoDTO::new);
+            userPage=userRepository.findByCompanyName(value,pageable).map(
+                    user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user)));
         }else if(select.equals("담당자명")){
-//            userList=userRepository.findByManagerName(value).stream().map(UsersInfoDTO::new).toList();
-            userPage=userRepository.findByManagerName(value,pageable).map(UsersInfoDTO::new);
+            userPage=userRepository.findByManagerName(value,pageable).map(
+                    user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user)));
         }else {
-//            userList=userRepository.findAll().stream().map(UsersInfoDTO::new).toList();
-            userPage = userRepository.findAll(pageable).map(UsersInfoDTO::new);
+            userPage = userRepository.findAll(pageable).map(
+                    user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user)));
         }
-
-//        return new ResponseEntity<>(userList,HttpStatus.OK);
-        // page로 주기
-//        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(user -> UserInfoResponseDTO.from(user));
-//        Page<UserInfoResponseDTO>  userPage = userRepository.findAll(pageable).map(UserInfoResponseDTO::new);
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 
     public ResponseEntity<?> getUserInfo(String userId) {
 
-        attachmentFileRepository.findByUserAdditionalData(userRepository.findByUserId(userId).get());
         return new ResponseEntity<>(userRepository.findByUserId(userId).map(
                 user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user))),
                 HttpStatus.OK);
@@ -450,5 +435,23 @@ public class UserService {
             attachmentFileRepository.save(attachmentFile);
         }
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getUsersByRole(Pageable pageable,UserRole userRole, String select, String value) {
+        Page<UserInfoResponseDTO> userPage = null;
+        if(select==null) {
+            userPage = userRepository.findByRole(userRole,pageable).map(
+                    user -> new UserInfoResponseDTO().from(user, attachmentFileRepository.findByUserAdditionalData(user)));
+        }else if(select.equals("업체명")){
+            userPage=userRepository.findByCompanyNameAndRole(value,userRole,pageable).map(
+                    user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user)));
+        }else if(select.equals("담당자명")){
+            userPage=userRepository.findByManagerNameAndRole(value,userRole,pageable).map(
+                    user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user)));
+        }else {
+            userPage = userRepository.findByRole(userRole,pageable).map(
+                    user -> new UserInfoResponseDTO().from(user,attachmentFileRepository.findByUserAdditionalData(user)));
+        }
+        return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
 }
