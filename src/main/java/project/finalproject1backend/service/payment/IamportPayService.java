@@ -8,11 +8,13 @@ import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.finalproject1backend.dto.pay.iamport.IamportCancelRequestDTO;
 import project.finalproject1backend.exception.PaymentCancellationException;
 import project.finalproject1backend.exception.PaymentException;
 import project.finalproject1backend.service.UserService;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -110,6 +112,34 @@ public class IamportPayService {
     }
 
     /**
+     * 특정 금액 환불 로직
+     * 
+     * @param requestDTO
+     */
+    public void cancelAmount(IamportCancelRequestDTO requestDTO) {
+
+        IamportClient client = getClient();
+        // 환불 금액
+        BigDecimal cancelAmount = BigDecimal.valueOf(requestDTO.getCancel_amount());
+        // 환불 데이터
+        CancelData cancel_data = new CancelData(requestDTO.getMerchant_uid(), false, cancelAmount);
+        // checksum 으로 검증 추가
+        cancel_data.setChecksum(cancelAmount); 
+
+        try {
+            // 환불 실행
+            IamportResponse<Payment> payment_response = client.cancelPaymentByImpUid(cancel_data);
+
+            // TODO: 2023-05-19 환불 관련 DB 추가 product, orders
+
+        } catch (IamportResponseException | IOException e) {
+            throw new PaymentException();
+        }
+
+
+    }
+
+    /**
      *  전액 환불
      *
      * @param imp_uid
@@ -131,6 +161,5 @@ public class IamportPayService {
         }
 
     }
-
 
 }
