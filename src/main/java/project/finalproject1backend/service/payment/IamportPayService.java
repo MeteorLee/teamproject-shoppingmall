@@ -8,7 +8,7 @@ import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.finalproject1backend.dto.pay.iamport.IamportCallbackDTO;
+import project.finalproject1backend.exception.PaymentCancellationException;
 import project.finalproject1backend.exception.PaymentException;
 import project.finalproject1backend.service.UserService;
 
@@ -51,25 +51,24 @@ public class IamportPayService {
      * @param amount
      * @param imp_uid
      */
-    public void verifyAmount(Integer amount, String imp_uid) {
-
-        IamportClient client = getClient();
+    public void verifyAmount(int amount, String imp_uid) {
 
         try {
+            IamportClient client = getClient();
+
+            // pg사 정보 받기
             IamportResponse<Payment> payment_response = client.paymentByImpUid(imp_uid);
 
-            Integer iamportPaymentAmount = payment_response.getResponse().getAmount().intValue();
+            // pg사에 저장된 금액
+            int iamportPaymentAmount = payment_response.getResponse().getAmount().intValue();
 
-            if (amount != iamportPaymentAmount) {
-                // TODO: 2023-05-18 값이 안맞을 경우 로직 필요 (DB정보 삭제 + 결제 취소 로직 필요)
-
-//                // imp_uid를 통한 전액취소
-//                CancelData cancel_data = new CancelData(imp_uid, true);
-//                IamportResponse<Payment> cancel_response = client.cancelPaymentByImpUid(cancel_data);
-
+            if (amount != iamportPaymentAmount) { // 금액이 다를 경우
+                this.cancelPayment(imp_uid);
+                throw new PaymentException();
             }
 
         } catch (IamportResponseException | IOException e) {
+            this.cancelPayment(imp_uid);
             throw new PaymentException();
         }
 
@@ -78,28 +77,60 @@ public class IamportPayService {
     /**
      * 주문 번호 검증
      * 
-     * @param requestDTO
+     * @param imp_uid
      */
-    public void verifyUid(IamportCallbackDTO requestDTO) {
+    public void verifyUid(String imp_uid) {
 
         IamportClient client = getClient();
 
-        String imp_uid = requestDTO.getImp_uid();
-
         try {
+
+            // 아임포트 정보 받기
             IamportResponse<Payment> payment_response = client.paymentByImpUid(imp_uid);
 
             // TODO: 2023-05-18 가맹점 번호 검증 로직 구현 필요
+            // 아임포트 가맹점 주문 번호
             String iamportMerchantUid = payment_response.getResponse().getMerchantUid();
-            // String requestDTOMerchantUid = ...
+
+            // DB 가맹점 주문 번호
+//            String storeMerchantUid = DB작업 필요
+
+//
+//            if (iamportMerchantUid != ) {
+//                this.cancelPayment(imp_uid);
+//                throw new PaymentException();
+//            }
 
 
         } catch (IamportResponseException | IOException e) {
+            this.cancelPayment(imp_uid);
             throw new PaymentException();
         }
 
     }
 
+    /**
+     *  전액 환불
+     *
+     * @param imp_uid
+     */
+    private void cancelPayment(String imp_uid) {
+
+        try {
+            IamportClient client = getClient();
+
+            // imp_uid를 이용한 전액 환불
+            CancelData cancel_data = new CancelData(imp_uid, true);
+            IamportResponse<Payment> cancel_response = client.cancelPaymentByImpUid(cancel_data);
+
+            // TODO: 2023-05-19 DB작업 필요
+
+        } catch (Exception e) {
+            // TODO: 2023-05-19 전액 환불 로직에서 문제가 생긴다면 어떻게 처리해야할까?
+            throw new PaymentCancellationException();
+        }
+
+    }
 
 
 }

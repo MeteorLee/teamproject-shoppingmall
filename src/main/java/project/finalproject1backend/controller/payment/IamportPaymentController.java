@@ -36,7 +36,7 @@ public class IamportPaymentController {
         iamportPayService.verifyEmail(principal.getName(), requestDTO.getMerchant_uid());
 
         // 주문 번호 검증
-        iamportPayService.verifyUid(requestDTO);
+        iamportPayService.verifyUid(requestDTO.getImp_uid());
 
         // TODO: 2023-05-19 product DB 작업(재고 줄이기) + orders DB에 저장
 
