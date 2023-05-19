@@ -39,9 +39,9 @@ public class IamportPayService {
      * 
      * @param email
      */
-    public void verifyEmail(String email) {
+    public void verifyEmail(String email, String merchant_uid) {
 
-        // TODO: 2023-05-18 주문번호 -> orders -> username -> user 검증 로직 구현 필요
+        // TODO: 2023-05-18 주문번호 -> orders레포지토리를 통해서 접근해서 user 비교 검증
 
     }
 
@@ -63,9 +63,9 @@ public class IamportPayService {
             if (amount != iamportPaymentAmount) {
                 // TODO: 2023-05-18 값이 안맞을 경우 로직 필요 (DB정보 삭제 + 결제 취소 로직 필요)
 
-                // imp_uid를 통한 전액취소
-                CancelData cancel_data = new CancelData(imp_uid, true);
-                IamportResponse<Payment> cancel_response = client.cancelPaymentByImpUid(cancel_data);
+//                // imp_uid를 통한 전액취소
+//                CancelData cancel_data = new CancelData(imp_uid, true);
+//                IamportResponse<Payment> cancel_response = client.cancelPaymentByImpUid(cancel_data);
 
             }
 

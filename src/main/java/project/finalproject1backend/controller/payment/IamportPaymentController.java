@@ -33,10 +33,12 @@ public class IamportPaymentController {
     public ResponseEntity<ResponseDTO> callback(@RequestBody @Valid IamportCallbackDTO requestDTO, Principal principal) {
 
         // 유저 검증
-        iamportPayService.verifyEmail(principal.getName());
+        iamportPayService.verifyEmail(principal.getName(), requestDTO.getMerchant_uid());
 
         // 주문 번호 검증
         iamportPayService.verifyUid(requestDTO);
+
+        // TODO: 2023-05-19 product DB 작업(재고 줄이기) + orders DB에 저장
 
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
@@ -52,7 +54,7 @@ public class IamportPaymentController {
     public ResponseEntity<ResponseDTO> verify(@RequestBody @Valid IamportVerificaitonDTO requestDTO, Principal principal) {
 
         // 유저 검증
-        iamportPayService.verifyEmail(principal.getName());
+        iamportPayService.verifyEmail(principal.getName(), requestDTO.getMerchant_uid());
 
         // 금액 검증
         iamportPayService.verifyAmount(requestDTO.getAmount(), requestDTO.getImp_uid());
@@ -60,12 +62,12 @@ public class IamportPaymentController {
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
 
-    @PostMapping("/refund")
-    public ResponseEntity<ResponseDTO> refund(Principal principal) {
-
-        iamportPayService.verifyEmail(principal.getName());
-
-        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
-    }
+//    @PostMapping("/refund")
+//    public ResponseEntity<ResponseDTO> refund(Principal principal) {
+//
+////        iamportPayService.verifyEmail(principal.getName());
+//
+//        return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
+//    }
 
 }
