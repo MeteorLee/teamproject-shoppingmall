@@ -17,7 +17,6 @@ public class KakaoPayService {
 
     static final String cid = "TC0ONETIME"; // 가맹점 테스트 코드
     static final String admin_Key = "54d374f18f8a15516b5fa7b6930c2640"; // ADMIN 키
-    private KakaoReadyResponse response;
 
     /**
      * 결제 요청
@@ -40,10 +39,10 @@ public class KakaoPayService {
 //        parameters.add("vat_amount", "0"); // 상품 부가세 금액 필수 아님
         
         parameters.add("tax_free_amount", "0"); // 상품 비과세 금액 일단 0으로 설정
-        // TODO: 2023-05-12 url 수정 필요  
-        parameters.add("approval_url", "http://locahost8080/account/pay/kakao/success"); // 성공 시 redirect url
-        parameters.add("cancel_url", "http://locahost8080/account/pay/kakao/cancel"); // 취소 시 redirect url
-        parameters.add("fail_url", "http://locahost8080/account/pay/kakao/fail"); // 실패 시 redirect url
+        // TODO: 2023-05-12 url 잘 작동하는 지 확인 필요
+        parameters.add("approval_url", "http://52.78.88.121:8080/account/pay/kakao/success"); // 성공 시 redirect url
+        parameters.add("cancel_url", "http://52.78.88.121:8080/account/pay/kakao/cancel"); // 취소 시 redirect url
+        parameters.add("fail_url", "http://52.78.88.121:8080/account/pay/kakao/fail"); // 실패 시 redirect url
 
         // 파라미터, 헤더
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
@@ -51,10 +50,12 @@ public class KakaoPayService {
         // 외부에 보낼 url
         RestTemplate restTemplate = new RestTemplate();
 
-        response = restTemplate.postForObject(
+        KakaoReadyResponse response = restTemplate.postForObject(
                 "https://kapi.kakao.com/v1/payment/ready",
                 requestEntity,
                 KakaoReadyResponse.class);
+
+        // TODO: 2023-05-19 DB 접근 여부
 
         return response;
     }
@@ -70,7 +71,9 @@ public class KakaoPayService {
         // 카카오 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
-        parameters.add("tid", response.getTid());
+        // TODO: 2023-05-19 tid 주고 받는 방식 결정
+        parameters.add("tid", "tid");
+
         parameters.add("partner_order_id", "가맹점 주문 번호");
         parameters.add("partner_user_id", "가맹점 회원 ID");
         parameters.add("pg_token", pgToken);

@@ -24,9 +24,11 @@ public class KakaoPaymentController {
      * @return
      */
     @PostMapping("/ready")
-    public KakaoReadyResponse readyToKakaoPay(@RequestBody @Valid KakaoPayRequsetDTO requsetDTO) {
+    public ResponseEntity<KakaoReadyResponse> readyToKakaoPay(@RequestBody @Valid KakaoPayRequsetDTO requsetDTO) {
 
-        return kakaoPayService.kakaoPayReady(requsetDTO);
+        KakaoReadyResponse response = kakaoPayService.kakaoPayReady(requsetDTO);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
