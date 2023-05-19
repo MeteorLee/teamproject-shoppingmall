@@ -43,6 +43,7 @@ public class IamportPaymentController {
         iamportPayService.verifyUid(requestDTO);
 
         // TODO: 2023-05-19 DB 반영 필요
+        iamportPayService.saveImpUid(requestDTO);
 
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
@@ -63,6 +64,9 @@ public class IamportPaymentController {
 
         // 금액 검증
         iamportPayService.verifyAmount(requestDTO.getAmount(), requestDTO.getImp_uid());
+
+        // 결제 DB 반영
+        iamportPayService.savePurchased(requestDTO);
 
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }

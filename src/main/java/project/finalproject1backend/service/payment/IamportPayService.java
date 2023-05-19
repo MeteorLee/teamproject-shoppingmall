@@ -12,6 +12,7 @@ import project.finalproject1backend.domain.OrderStatus;
 import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.dto.pay.iamport.IamportCallbackDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportCancelRequestDTO;
+import project.finalproject1backend.dto.pay.iamport.IamportVerificaitonDTO;
 import project.finalproject1backend.exception.PaymentCancelAllException;
 import project.finalproject1backend.exception.PaymentException;
 import project.finalproject1backend.exception.PaymentRefundException;
@@ -59,7 +60,6 @@ public class IamportPayService {
             this.cancelPaymentByImpUid(order.getPgUid());
             throw new PaymentException();
         }
-
 
     }
 
@@ -158,7 +158,7 @@ public class IamportPayService {
             order.setTotalPrice(dbAmount - requestDTO.getCancel_amount());
             orderRepository.save(order);
 
-            // TODO: 2023-05-19 재고 DB반영 여부 모름
+            // TODO: 2023-05-19 특정 금액 환불 시 재고 DB반영 여부 모름
 
         } catch (IamportResponseException | IOException e) {
             throw new PaymentException();
@@ -184,7 +184,7 @@ public class IamportPayService {
             order.setStatus(OrderStatus.CANCELED);
             orderRepository.save(order);
 
-            // TODO: 2023-05-19 재고 DB 반영 추가 여부 모름
+            // TODO: 2023-05-19 전액 환불 or 주문 취소 시 재고 DB 반영 추가 여부 모름
 
         } catch (Exception e) {
             // TODO: 2023-05-19 전액 환불 로직에서 문제가 생긴다면 어떻게 처리해야할까?
@@ -220,6 +220,32 @@ public class IamportPayService {
 
     }
 
+    /**
+     * pg사 주문 번호 DB 반영
+     * 
+     * @param requestDTO
+     */
+    public void saveImpUid(IamportCallbackDTO requestDTO) {
 
+        // 주문 정보 가져오기
+        Orders order = this.getOrdersByMerchant_uid(requestDTO.getMerchant_uid());
+        order.setPgUid(requestDTO.getImp_uid());
+        orderRepository.save(order);
 
+    }
+
+    /**
+     * 결제 완료 DB 반영
+     * 
+     * @param requestDTO
+     */
+    public void savePurchased(IamportVerificaitonDTO requestDTO) {
+
+        // 주문 정보 가져오기
+        Orders order = this.getOrdersByMerchant_uid(requestDTO.getMerchant_uid());
+        order.setStatus(OrderStatus.PURCHASED);
+        orderRepository.save(order);
+
+        // TODO: 2023-05-20 결제 완료시 재고 관련 DB 작업 여부 모름
+    }
 }
