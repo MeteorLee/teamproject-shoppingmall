@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import project.finalproject1backend.dto.ErrorDTO;
+import project.finalproject1backend.dto.ResponseDTO;
+import project.finalproject1backend.exception.PaymentException;
 
 import java.nio.file.AccessDeniedException;
 
@@ -30,5 +32,16 @@ public class ControllerAdvice {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException e){
         return new ResponseEntity<>(new ErrorDTO("401",e.getMessage()), HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * 결제 오류 처리
+     *
+     * @return
+     */
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ResponseDTO> PaymentExceptionHandler() {
+
+        return new ResponseEntity<>(new ResponseDTO("400","fail"), HttpStatus.OK);
     }
 }
