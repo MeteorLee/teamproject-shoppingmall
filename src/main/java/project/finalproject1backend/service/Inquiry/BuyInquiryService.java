@@ -99,6 +99,12 @@ public class BuyInquiryService {
         }else if(type.equals("기업명")){
             result =
                     buyInquiryRepository.findByBuyInquiryId_CompanyName(search,pageable).map(BuyInquiryResponseDTO::new);
+        }else if(type.equals("상태")){
+            if(search==null){
+                throw new IllegalArgumentException("nullError");
+            }
+            result =
+                    buyInquiryRepository.findByState(BuyInquiryState.valueOf(search),pageable).map(BuyInquiryResponseDTO::new);
         }else{
             result = buyInquiryRepository.findAll(pageable).map(BuyInquiryResponseDTO::new);
         }
