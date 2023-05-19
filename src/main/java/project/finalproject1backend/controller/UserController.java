@@ -168,11 +168,11 @@ public class UserController {
     @Operation(summary = "마이 페이지(account 정보수정)", description = "마이 페이지(account 정보수정) 메서드입니다.'password','phoneNumber','managerName','email','companyName' 수정 가능합니다.",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ModifyRequestDTO.class))),
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
     @PostMapping("/account/modify")
-    public ResponseEntity<?> modify(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal, @RequestBody ModifyRequestDTO modifyRequestDTO) {
+    public ResponseEntity<?> modify(@Parameter(hidden = true)@AuthenticationPrincipal PrincipalDTO principal, @RequestBody UserModifyRequestDTO modifyRequestDTO) {
         return userService.modify(principal,modifyRequestDTO);
     }
 
@@ -216,7 +216,7 @@ public class UserController {
     @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.select : “업체명”, “담당자명”",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
     })
     @GetMapping("/account/admin/users")
     public ResponseEntity<?> getUsers( @Parameter(example = "{\n" +
