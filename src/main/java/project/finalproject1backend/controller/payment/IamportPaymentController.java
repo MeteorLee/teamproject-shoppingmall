@@ -40,10 +40,9 @@ public class IamportPaymentController {
         iamportPayService.verifyEmail(principal.getEmail(), requestDTO.getMerchant_uid());
 
         // 주문 번호 검증
-        iamportPayService.verifyUid(requestDTO.getImp_uid());
+        iamportPayService.verifyUid(requestDTO);
 
-        // DB에 반영
-        iamportPayService.sendSuccessDB(requestDTO.getMerchant_uid());
+        // TODO: 2023-05-19 DB 반영 필요
 
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
