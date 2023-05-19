@@ -17,5 +17,6 @@ public class IamportCallbackDTO {
     private String imp_uid; // 고유 주문 번호
     @NotBlank
     private String merchant_uid; // 가맹점 주문 번호
+    // TODO: 2023-05-19 product 정보 추가 필요
 
 }

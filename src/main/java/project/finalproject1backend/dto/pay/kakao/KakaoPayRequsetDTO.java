@@ -25,5 +25,6 @@ public class KakaoPayRequsetDTO {
     private int quantity;
     @Min(1)
     private int total_amount;
+    // TODO: 2023-05-19 product 정보 추가 필요
 
 }

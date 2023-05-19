@@ -19,4 +19,5 @@ public class KakaoCancelRequestDTO {
     @NotBlank
     @Min(0)
     private int cancel_amount; // 취소 금액
+    // TODO: 2023-05-19 product 정보 추가 필요
 }
