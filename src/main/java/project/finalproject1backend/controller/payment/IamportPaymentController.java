@@ -42,7 +42,8 @@ public class IamportPaymentController {
         // 주문 번호 검증
         iamportPayService.verifyUid(requestDTO.getImp_uid());
 
-        // TODO: 2023-05-19 product DB 작업(재고 줄이기) + orders DB에 저장
+        // DB에 반영
+        iamportPayService.sendSuccessDB(requestDTO.getMerchant_uid());
 
         return new ResponseEntity<>(new ResponseDTO("200","success"), HttpStatus.OK);
     }
