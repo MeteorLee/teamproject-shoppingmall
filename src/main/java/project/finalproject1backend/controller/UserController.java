@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.finalproject1backend.domain.UserRole;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ModifyRequestDTO;
 import project.finalproject1backend.dto.PrincipalDTO;
@@ -212,7 +213,7 @@ public class UserController {
 
 
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
-    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.select : “업체명”,”ROLE_REFUSE “ROLE_USER”,”ROLE_STANDBY, “담당자명”",
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회", description = "관리자 페이지(고객관리) 전체조회 메서드입니다.select : “업체명”, “담당자명”",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
@@ -223,23 +224,63 @@ public class UserController {
             "  \"size\": 15,\n" +
             "  \"sort\" : \"id\"\n" +
             "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
-//    public ResponseEntity<?> getUsers(@RequestParam(required = false) String select,@RequestParam(required = false) String value) {
         return userService.getUsers(pageable,select,value);
-//        return new ResponseEntity<>(pageable,HttpStatus.OK);
-//        return userService.getUsers(select,value);
     }
-
-
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
-    @Operation(summary = "관리자 페이지(고객관리) 선택조회", description = "관리자 페이지(고객관리) 선택조회 메서드입니다.",
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회(ROLE_USER)", description = "관리자 페이지(고객관리) 전체조회(ROLE_USER) 메서드입니다.select : “업체명”, “담당자명”",
             security ={ @SecurityRequirement(name = "bearer-key") })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
     })
-    @GetMapping("/account/admin/usersInfo/{userId}")
-    public ResponseEntity<?> getUserInfo(@PathVariable String userId) {
-        return userService.getUserInfo(userId);
+    @GetMapping("/account/admin/users/getRoleUser")
+    public ResponseEntity<?> getUsersRoleUser( @Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
+        return userService.getUsersByRole(pageable, UserRole.ROLE_USER,select,value);
     }
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회(ROLE_STANDBY)", description = "관리자 페이지(고객관리) 전체조회(ROLE_STANDBY) 메서드입니다.select : “업체명”, “담당자명”",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
+    })
+    @GetMapping("/account/admin/users/getRoleStandby")
+    public ResponseEntity<?> getUsersRoleStandby( @Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
+        return userService.getUsersByRole(pageable, UserRole.ROLE_STANDBY,select,value);
+    }
+    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+    @Operation(summary = "관리자 페이지(고객관리) 전체조회(ROLE_REFUSE)", description = "관리자 페이지(고객관리) 전체조회(ROLE_REFUSE) 메서드입니다.select : “업체명”, “담당자명”",
+            security ={ @SecurityRequirement(name = "bearer-key") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UsersInfoDTO.class))),
+    })
+    @GetMapping("/account/admin/users/getRoleRefuse")
+    public ResponseEntity<?> getUsersRoleRefused( @Parameter(example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 15,\n" +
+            "  \"sort\" : \"id\"\n" +
+            "}")@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.ASC) Pageable pageable, @RequestParam(required = false) String select, @RequestParam(required = false) String value) {
+        return userService.getUsersByRole(pageable, UserRole.ROLE_REFUSE,select,value);
+
+    }
+
+
+//    @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
+//    @Operation(summary = "관리자 페이지(고객관리) 선택조회", description = "관리자 페이지(고객관리) 선택조회 메서드입니다.",
+//            security ={ @SecurityRequirement(name = "bearer-key") })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = UserInfoResponseDTO.class))),
+//    })
+//    @GetMapping("/account/admin/usersInfo/{userId}")
+//    public ResponseEntity<?> getUserInfo(@PathVariable String userId) {
+//        return userService.getUserInfo(userId);
+//    }
 
 
     @Tag(name = "API 관리자페이지", description = "관리자페이지 api 입니다.")
