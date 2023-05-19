@@ -12,6 +12,7 @@ import project.finalproject1backend.domain.OrderStatus;
 import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.dto.pay.iamport.IamportCallbackDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportCancelRequestDTO;
+import project.finalproject1backend.dto.pay.iamport.IamportVerificaitonDTO;
 import project.finalproject1backend.exception.PaymentCancelAllException;
 import project.finalproject1backend.exception.PaymentException;
 import project.finalproject1backend.exception.PaymentRefundException;
@@ -59,7 +60,6 @@ public class IamportPayService {
             this.cancelPaymentByImpUid(order.getPgUid());
             throw new PaymentException();
         }
-
 
     }
 
@@ -220,6 +220,30 @@ public class IamportPayService {
 
     }
 
+    /**
+     * pg사 주문 번호 DB 반영
+     * 
+     * @param requestDTO
+     */
+    public void saveImpUid(IamportCallbackDTO requestDTO) {
 
+        // 주문 정보 가져오기
+        Orders order = this.getOrdersByMerchant_uid(requestDTO.getMerchant_uid());
+        order.setPgUid(requestDTO.getImp_uid());
+        orderRepository.save(order);
 
+    }
+
+    /**
+     * 결제 완료 DB 반영
+     * 
+     * @param requestDTO
+     */
+    public void savePurchased(IamportVerificaitonDTO requestDTO) {
+
+        // 주문 정보 가져오기
+        Orders order = this.getOrdersByMerchant_uid(requestDTO.getMerchant_uid());
+        order.setStatus(OrderStatus.PURCHASED);
+        orderRepository.save(order);
+    }
 }
