@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 public class IamportVerificaitonDTO {
 
     @NotBlank
-    private String imp_uid; // 고유 주문 번호
+    private String imp_uid; // pg사 주문 번호
     @NotBlank
     private String merchant_uid; // 가맹점 주문 번호
     @NotBlank

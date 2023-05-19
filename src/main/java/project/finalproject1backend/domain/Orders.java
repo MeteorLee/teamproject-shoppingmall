@@ -56,10 +56,10 @@ public class Orders extends AuditingFields {
     private long deliveryNumber; //
 
     @Setter
-    private OrderStatus status;
+    private OrderStatus status; // 주문 상태
 
     @Setter
-    private String pgUid;
+    private String pgUid; // pg사 주문 번호
 
     public void setUser(User user){ this.user = user;}
 
