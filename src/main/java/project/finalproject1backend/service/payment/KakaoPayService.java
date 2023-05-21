@@ -36,11 +36,18 @@ public class KakaoPayService {
         // 카카오페이 요청 양식
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
 
-        Orders order = this.getOrdersByPartnerOrderId(requsetDTO.getPartner_order_id());
+        String partner_order_id = requsetDTO.getPartner_order_id();
+        Orders order = this.getOrdersByPartnerOrderId(partner_order_id);
+
+        // 입력 받은 금액과 DB 금액이 비교
+        int dbAmount = order.getTotalPrice();
+        if (dbAmount != requsetDTO.getTotal_amount()) {
+            throw new PaymentException();
+        }
 
         // 서버와 주고 받을 정보
         parameters.add("cid", cid);
-        parameters.add("partner_order_id", String.valueOf(order.getNumber()));
+        parameters.add("partner_order_id", partner_order_id);
         parameters.add("partner_user_id", order.getUser().getEmail());
         parameters.add("total_amount", String.valueOf(order.getTotalPrice()));
 
@@ -53,7 +60,8 @@ public class KakaoPayService {
 //        parameters.add("vat_amount", "0"); // 상품 부가세 금액 필수 아님, 없으면 0 설정
         
         // TODO: 2023-05-12 url 잘 작동하는 지 확인 필요
-        parameters.add("approval_url", "http://52.78.88.121:8080/account/pay/kakao/success"); // 성공 시 redirect url
+        parameters.add("approval_url", "http://52.78.88.121:8080/account/pay/kakao/success?partner_order_id=" +
+                partner_order_id); // 성공 시 redirect url, 주문 번호 쿼리 스트링 추가
         parameters.add("cancel_url", "http://52.78.88.121:8080/account/pay/kakao/cancel"); // 취소 시 redirect url
         parameters.add("fail_url", "http://52.78.88.121:8080/account/pay/kakao/fail"); // 실패 시 redirect url
 
