@@ -44,9 +44,9 @@ public class BuyInquiryService {
 
     private final UploadUtil uploadUtil;
 
-//    private String path = "C:\\Users\\user\\Downloads\\my\\파이널 프로젝트 저장 폴더";  //로컬 테스트용
+    private String path = "C:\\Users\\user\\Downloads\\my\\파이널 프로젝트 저장 폴더";  //로컬 테스트용
 
-    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
+//    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
 
     public ResponseEntity<?> buyInquiryCreat(BuyInquiryDTO requestDTO, List<MultipartFile> buyImageList, PrincipalDTO principal) {
 
