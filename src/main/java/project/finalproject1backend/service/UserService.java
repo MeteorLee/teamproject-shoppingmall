@@ -45,7 +45,6 @@ public class UserService {
 //    private String path = "C:\\upload";  //로컬 테스트용
     private String path = "/home/ubuntu/FinalProject/upload/users";  // 배포용
 
-    
     public ResponseEntity<?> signUp(UserSignUpRequestDTO requestDTO, List<MultipartFile> businessLicense){
         if(userRepository.existsByUserId(requestDTO.getUserId())) {
             throw new IllegalArgumentException("existId");
