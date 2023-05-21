@@ -79,15 +79,4 @@ public class SaleInquiryController {
     public ResponseEntity<?> saleInquiryState(@PathVariable String inquiryId, @RequestParam SaleInquiryState state){
         return saleInquiryService.saleInquiryState(inquiryId, state);
     }
-
-    @Tag(name = "API 문의하기", description = "문의하기 api 입니다.")
-    @Operation(summary = "관리자 페이지(판매문의 제품등록파일 조회)", description = "관리자 페이지(판매문의 제품등록파일 조회) 메서드입니다.", security ={ @SecurityRequirement(name = "bearer-key") })
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = ResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "bad request operation", content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
-    })
-    @PostMapping(value = "/admin/saleInquiry/saleAttachment/{inquiryId}",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saleInquirySaleAttachment (@PathVariable  String inquiryId, @RequestParam SaleInquiry saleInquiry) {
-        return saleInquiryService.saleInquirySaleAttachment(inquiryId, saleInquiry);
-    }
 }

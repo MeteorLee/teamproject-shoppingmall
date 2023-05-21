@@ -42,10 +42,9 @@ public class SaleInquiryService {
 
     private final UploadUtil uploadUtil;
 
-    private String path = "C:\\Users\\user\\Downloads\\my\\파이널 프로젝트 저장 폴더";  //로컬 테스트용
+//    private String path = "C:\\Users\\user\\Downloads\\my\\파이널 프로젝트 저장 폴더";  //로컬 테스트용
 
-
-//    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
+    private String path = "/home/ubuntu/FinalProject/upload/inquiry";  // 배포용
     public ResponseEntity<?> saleInquiryCreat(SaleInquiryDTO requestDTO, List<MultipartFile> saleAttachmentList, PrincipalDTO principal) {
 
         Optional<User> user = userRepository.findByUserId(principal.getUserId());
@@ -126,17 +125,6 @@ public class SaleInquiryService {
         saleInquiry.get().setState(states);
 
         saleInquiryRepository.save(saleInquiry.get());
-
-        return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> saleInquirySaleAttachment(String inquiryId, SaleInquiry saleInquiry) {
-
-        Optional<SaleInquiry> saleInquiry1 = saleInquiryRepository.findById(inquiryId);
-
-        if(!saleInquiry1.get().getId().equals(saleInquiry.getId())){
-            throw new IllegalArgumentException("checkSaleAttachmentList");
-        }
 
         return new ResponseEntity<>(new ResponseDTO("200", "success"), HttpStatus.OK);
     }
