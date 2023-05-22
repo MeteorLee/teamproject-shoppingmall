@@ -13,9 +13,7 @@ import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.dto.pay.iamport.IamportCallbackDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportCancelRequestDTO;
 import project.finalproject1backend.dto.pay.iamport.IamportVerificaitonDTO;
-import project.finalproject1backend.exception.PaymentCancelAllException;
-import project.finalproject1backend.exception.PaymentException;
-import project.finalproject1backend.exception.PaymentRefundException;
+import project.finalproject1backend.exception.payment.iamport.*;
 import project.finalproject1backend.repository.OrderRepository;
 
 import java.io.IOException;
@@ -58,7 +56,7 @@ public class IamportPayService {
 
         if (loginEmail.equals(pgEmail)) { // 다를 경우 주문 취소
             this.cancelPaymentByImpUid(order.getPgUid());
-            throw new PaymentException();
+            throw new IamportSinglePaymentVerificationEmailException();
         }
 
     }
@@ -82,12 +80,12 @@ public class IamportPayService {
 
             if (amount != iamportPaymentAmount) { // 금액이 다를 경우
                 this.cancelPaymentByImpUid(imp_uid);
-                throw new PaymentException();
+                throw new IamportSinglePaymentVerificationAmountException();
             }
 
         } catch (IamportResponseException | IOException e) {
             this.cancelPaymentByImpUid(imp_uid);
-            throw new PaymentException();
+            throw new IamportSinglePaymentConnectionInfoException();
         }
 
     }
@@ -109,7 +107,6 @@ public class IamportPayService {
             // DB 주문 정보
             Orders order = this.getOrdersByMerchant_uid(requestDTO.getMerchant_uid());
 
-
             // pg사 주문 번호
             String pgMerchantUid = payment_response.getResponse().getMerchantUid();
             // db 주문 정보
@@ -117,12 +114,12 @@ public class IamportPayService {
 
             if (pgMerchantUid.equals(orderMerchantUid)) { // 다를 경우
                 this.cancelPaymentByImpUid(requestDTO.getImp_uid());
-                throw new PaymentException();
+                throw new IamportSinglePaymentVerificationMerchantUidException();
             }
 
         } catch (IamportResponseException | IOException e) {
             this.cancelPaymentByImpUid(requestDTO.getImp_uid());
-            throw new PaymentException();
+            throw new IamportSinglePaymentConnectionInfoException();
         }
 
     }
@@ -147,27 +144,26 @@ public class IamportPayService {
         int dbAmount = order.getTotalPrice();
 
         if (requestDTO.getCancel_amount() > dbAmount) { // DB 총 금액과 request 환불 금액 비교
-            throw new PaymentRefundException();
+            throw new IamportRefundVerificationAmountException();
         }
 
         try {
             // 환불 실행
             IamportResponse<Payment> payment_response = client.cancelPaymentByImpUid(cancel_data);
 
-            // DB 반영
-            order.setTotalPrice(dbAmount - requestDTO.getCancel_amount());
-            orderRepository.save(order);
-
-            // TODO: 2023-05-19 특정 금액 환불 시 재고 DB반영 여부 모름
-
         } catch (IamportResponseException | IOException e) {
-            throw new PaymentException();
+            throw new IamportSinglePaymentCancelException();
         }
 
+        // DB 반영
+        order.setTotalPrice(dbAmount - requestDTO.getCancel_amount());
+        orderRepository.save(order);
+
+        // TODO: 2023-05-19 특정 금액 환불 시 재고 DB반영 여부 모름
     }
 
     /**
-     *  전액 환불 or 주문 취소
+     *  주문 취소
      *
      * @param imp_uid
      */
@@ -188,7 +184,7 @@ public class IamportPayService {
 
         } catch (Exception e) {
             // TODO: 2023-05-19 전액 환불 로직에서 문제가 생긴다면 어떻게 처리해야할까?
-            throw new PaymentCancelAllException();
+            throw new IamportSinglePaymentCancelException();
         }
 
     }
@@ -203,7 +199,7 @@ public class IamportPayService {
     private Orders getOrdersByMerchant_uid(String merchant_uid) {
         // DB 접근하여 주문 정보 가져오기
         Optional<Orders> result = orderRepository.findByNumber(merchant_uid);
-        return result.orElseThrow(PaymentException::new);
+        return result.orElseThrow(IamportDBConnectionByMerchantUidException::new);
 
     }
 
@@ -216,7 +212,7 @@ public class IamportPayService {
     private Orders getOrdersByPGUid(String pgUid) {
         // DB 접근하여 주문 정보 가져오기
         Optional<Orders> result = orderRepository.findByPgUid(pgUid);
-        return result.orElseThrow(PaymentException::new);
+        return result.orElseThrow(IamportDBConnectionByPgUidException::new);
 
     }
 

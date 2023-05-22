@@ -12,11 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import project.finalproject1backend.domain.OrderStatus;
 import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.dto.pay.kakao.*;
-import project.finalproject1backend.exception.PaymentException;
-import project.finalproject1backend.exception.payment.kakao.KakaoDBConnectionException;
-import project.finalproject1backend.exception.payment.kakao.KakaoRefundException;
-import project.finalproject1backend.exception.payment.kakao.KakaoSinglePaymentApproveException;
-import project.finalproject1backend.exception.payment.kakao.KakaoSinglePaymentReadyException;
+import project.finalproject1backend.exception.payment.kakao.*;
 import project.finalproject1backend.repository.OrderRepository;
 
 import java.util.Optional;
@@ -156,7 +152,7 @@ public class KakaoPayService {
         int cancelAmount = requestDTO.getCancel_amount();
         int totalAmount = orders.getTotalPrice();
         if (cancelAmount > totalAmount) {
-            throw new PaymentException();
+            throw new KakaoRefundVerificationAmountException();
         }
 
         parameters.add("cancel_amount", String.valueOf(requestDTO.getCancel_amount()));
