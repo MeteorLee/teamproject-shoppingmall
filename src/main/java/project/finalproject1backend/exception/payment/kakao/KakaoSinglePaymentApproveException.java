@@ -1,4 +1,6 @@
 package project.finalproject1backend.exception.payment.kakao;
 
-public class KakaoSinglePaymentApproveException extends RuntimeException {
+import project.finalproject1backend.exception.payment.KakaoPaymentException;
+
+public class KakaoSinglePaymentApproveException extends KakaoPaymentException {
 }

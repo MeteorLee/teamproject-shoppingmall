@@ -7,7 +7,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import project.finalproject1backend.dto.ErrorDTO;
 import project.finalproject1backend.dto.ResponseDTO;
-import project.finalproject1backend.exception.PaymentException;
+import project.finalproject1backend.exception.payment.IamportPaymentException;
+import project.finalproject1backend.exception.payment.KakaoPaymentException;
 
 import java.nio.file.AccessDeniedException;
 
@@ -39,7 +40,7 @@ public class ControllerAdvice {
      *
      * @return
      */
-    @ExceptionHandler(PaymentException.class)
+    @ExceptionHandler({IamportPaymentException.class, KakaoPaymentException.class})
     public ResponseEntity<ResponseDTO> PaymentExceptionHandler() {
 
         return new ResponseEntity<>(new ResponseDTO("400","fail"), HttpStatus.OK);

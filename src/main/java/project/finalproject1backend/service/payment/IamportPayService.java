@@ -56,7 +56,7 @@ public class IamportPayService {
 
         if (loginEmail.equals(pgEmail)) { // 다를 경우 주문 취소
             this.cancelPaymentByImpUid(order.getPgUid());
-            throw new IamportSinglePaymentVerificationEmailException();
+            throw new IamportSingleIamportPaymentVerificationEmailException();
         }
 
     }
@@ -80,12 +80,12 @@ public class IamportPayService {
 
             if (amount != iamportPaymentAmount) { // 금액이 다를 경우
                 this.cancelPaymentByImpUid(imp_uid);
-                throw new IamportSinglePaymentVerificationAmountException();
+                throw new IamportSingleIamportPaymentVerificationAmountException();
             }
 
         } catch (IamportResponseException | IOException e) {
             this.cancelPaymentByImpUid(imp_uid);
-            throw new IamportSinglePaymentConnectionInfoException();
+            throw new IamportSingleIamportPaymentConnectionInfoException();
         }
 
     }
@@ -114,12 +114,12 @@ public class IamportPayService {
 
             if (pgMerchantUid.equals(orderMerchantUid)) { // 다를 경우
                 this.cancelPaymentByImpUid(requestDTO.getImp_uid());
-                throw new IamportSinglePaymentVerificationMerchantUidException();
+                throw new IamportSingleIamportPaymentVerificationMerchantUidException();
             }
 
         } catch (IamportResponseException | IOException e) {
             this.cancelPaymentByImpUid(requestDTO.getImp_uid());
-            throw new IamportSinglePaymentConnectionInfoException();
+            throw new IamportSingleIamportPaymentConnectionInfoException();
         }
 
     }
@@ -144,7 +144,7 @@ public class IamportPayService {
         int dbAmount = order.getTotalPrice();
 
         if (requestDTO.getCancel_amount() > dbAmount) { // DB 총 금액과 request 환불 금액 비교
-            throw new IamportRefundVerificationAmountException();
+            throw new IamportRefundVerificationAmountExceptionIamport();
         }
 
         try {
@@ -152,7 +152,7 @@ public class IamportPayService {
             IamportResponse<Payment> payment_response = client.cancelPaymentByImpUid(cancel_data);
 
         } catch (IamportResponseException | IOException e) {
-            throw new IamportSinglePaymentCancelException();
+            throw new IamportSingleIamportPaymentCancelException();
         }
 
         // DB 반영
@@ -184,7 +184,7 @@ public class IamportPayService {
 
         } catch (Exception e) {
             // TODO: 2023-05-19 전액 환불 로직에서 문제가 생긴다면 어떻게 처리해야할까?
-            throw new IamportSinglePaymentCancelException();
+            throw new IamportSingleIamportPaymentCancelException();
         }
 
     }
@@ -199,7 +199,7 @@ public class IamportPayService {
     private Orders getOrdersByMerchant_uid(String merchant_uid) {
         // DB 접근하여 주문 정보 가져오기
         Optional<Orders> result = orderRepository.findByNumber(merchant_uid);
-        return result.orElseThrow(IamportDBConnectionByMerchantUidException::new);
+        return result.orElseThrow(IamportDBConnectionByMerchantUidExceptionIamport::new);
 
     }
 
@@ -212,7 +212,7 @@ public class IamportPayService {
     private Orders getOrdersByPGUid(String pgUid) {
         // DB 접근하여 주문 정보 가져오기
         Optional<Orders> result = orderRepository.findByPgUid(pgUid);
-        return result.orElseThrow(IamportDBConnectionByPgUidException::new);
+        return result.orElseThrow(IamportDBConnectionByPgUidExceptionIamport::new);
 
     }
 
