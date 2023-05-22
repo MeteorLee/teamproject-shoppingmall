@@ -7,11 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import project.finalproject1backend.domain.OrderStatus;
 import project.finalproject1backend.domain.Orders;
 import project.finalproject1backend.dto.pay.kakao.*;
 import project.finalproject1backend.exception.PaymentException;
+import project.finalproject1backend.exception.payment.kakao.KakaoDBConnectionException;
+import project.finalproject1backend.exception.payment.kakao.KakaoRefundException;
+import project.finalproject1backend.exception.payment.kakao.KakaoSinglePaymentApproveException;
+import project.finalproject1backend.exception.payment.kakao.KakaoSinglePaymentReadyException;
 import project.finalproject1backend.repository.OrderRepository;
 
 import java.util.Optional;
@@ -28,7 +33,8 @@ public class KakaoPayService {
 
     /**
      * 결제 요청
-     *
+     * 
+     * @param requsetDTO
      * @return
      */
     public KakaoReadyResponse kakaoPayReady(KakaoPayRequsetDTO requsetDTO) {
@@ -42,7 +48,7 @@ public class KakaoPayService {
         // 입력 받은 금액과 DB 금액이 비교
         int dbAmount = order.getTotalPrice();
         if (dbAmount != requsetDTO.getTotal_amount()) {
-            throw new PaymentException();
+            throw new KakaoSinglePaymentReadyException();
         }
 
         // 서버와 주고 받을 정보
@@ -71,14 +77,18 @@ public class KakaoPayService {
         // 외부에 보낼 url
         RestTemplate restTemplate = new RestTemplate();
 
-        KakaoReadyResponse response = restTemplate.postForObject(
-                "https://kapi.kakao.com/v1/payment/ready",
-                requestEntity,
-                KakaoReadyResponse.class);
+        KakaoReadyResponse response = null;
+        try {
+            response = restTemplate.postForObject(
+                    "https://kapi.kakao.com/v1/payment/ready",
+                    requestEntity,
+                    KakaoReadyResponse.class);
+        } catch (RestClientException e) {
+            throw new KakaoSinglePaymentReadyException();
+        }
 
         // pg사 주문 번호 db 저장
         order.setPgUid(response.getTid());
-        // db 반영
         orderRepository.save(order);
 
         return response;
@@ -86,16 +96,15 @@ public class KakaoPayService {
 
     /**
      * 결제 승인
-     *
+     * 
      * @param pgToken
-     * @return
+     * @param partner_order_id
      */
     public void approveResponse(String pgToken, String partner_order_id) {
 
         // 카카오 요청
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("cid", cid);
-        // TODO: 2023-05-19 tid 주고 받는 방식 결정
 
         // DB 접근하여 주문 정보 가져오기
         Orders orders = this.getOrdersByPartnerOrderId(partner_order_id);
@@ -112,21 +121,27 @@ public class KakaoPayService {
         // 외부에 보낼 url
         RestTemplate restTemplate = new RestTemplate();
 
-        KakaoApproveResponse approveResponse = restTemplate.postForObject(
-                "https://kapi.kakao.com/v1/payment/approve",
-                requestEntity,
-                KakaoApproveResponse.class);
+        try {
+            KakaoApproveResponse approveResponse = restTemplate.postForObject(
+                    "https://kapi.kakao.com/v1/payment/approve",
+                    requestEntity,
+                    KakaoApproveResponse.class);
+        } catch (RestClientException e) {
+            throw new KakaoSinglePaymentApproveException();
+        }
 
+        // 주문 상태 DB 반영
         orders.setStatus(OrderStatus.PURCHASED);
         orderRepository.save(orders);
+
         // TODO: 2023-05-19 재고 관련 로직이 필요한지 아직 모름
 
     }
 
     /**
      * 결제 환불
-     *
-     * @return
+     * 
+     * @param requestDTO
      */
     public void kakaoCancel(KakaoCancelRequestDTO requestDTO) {
 
@@ -155,11 +170,16 @@ public class KakaoPayService {
         // 외부에 보낼 url
         RestTemplate restTemplate = new RestTemplate();
 
-        KakaoCancelResponse cancelResponse = restTemplate.postForObject(
-                "https://kapi.kakao.com/v1/payment/cancel",
-                requestEntity,
-                KakaoCancelResponse.class);
+        try {
+            KakaoCancelResponse cancelResponse = restTemplate.postForObject(
+                    "https://kapi.kakao.com/v1/payment/cancel",
+                    requestEntity,
+                    KakaoCancelResponse.class);
+        } catch (RestClientException e) {
+            throw new KakaoRefundException();
+        }
 
+        // 환불 금액 DB 반영
         orders.setTotalPrice(totalAmount - cancelAmount);
         orderRepository.save(orders);
     }
@@ -192,7 +212,7 @@ public class KakaoPayService {
         // DB 접근하여 주문 정보 가져오기
 
         Optional<Orders> result = orderRepository.findByNumber(partner_order_id);
-        return result.orElseThrow(PaymentException::new);
+        return result.orElseThrow(KakaoDBConnectionException::new);
 
     }
 }
