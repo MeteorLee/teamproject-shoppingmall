@@ -122,8 +122,8 @@ public class KakaoPayService {
                 "https://kapi.kakao.com/v1/payment/approve",
                 requestEntity,
                 KakaoApproveResponse.class);
-        orderRepository.save(orders);
         orders.setStatus(OrderStatus.PURCHASED);
+        orderRepository.save(orders);
         // TODO: 2023-05-19 재고 관련 로직이 필요한지 아직 모름
 
     }
