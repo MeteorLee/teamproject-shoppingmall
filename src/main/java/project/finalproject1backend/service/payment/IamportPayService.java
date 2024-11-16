@@ -56,7 +56,7 @@ public class IamportPayService {
         String loginEmail = email;
         String pgEmail = order.getUser().getEmail();
 
-        if (loginEmail.equals(pgEmail)) { // 다를 경우 주문 취소
+        if (!loginEmail.equals(pgEmail)) { // 다를 경우 주문 취소
             this.cancelPaymentByImpUid(order.getPgUid());
             throw new PaymentException();
         }
@@ -115,7 +115,7 @@ public class IamportPayService {
             // db 주문 정보
             String orderMerchantUid = order.getPgUid();
 
-            if (pgMerchantUid.equals(orderMerchantUid)) { // 다를 경우
+            if (!pgMerchantUid.equals(orderMerchantUid)) { // 다를 경우
                 this.cancelPaymentByImpUid(requestDTO.getImp_uid());
                 throw new PaymentException();
             }
