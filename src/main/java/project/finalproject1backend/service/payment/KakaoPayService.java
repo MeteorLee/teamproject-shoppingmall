@@ -44,6 +44,8 @@ public class KakaoPayService {
         // 입력 받은 금액과 DB 금액이 비교
         int dbAmount = order.getTotalPrice();
         if (dbAmount != requsetDTO.getTotal_amount()) {
+            order.setStatus(OrderStatus.ERROR);
+            orderRepository.save(order);
             throw new KakaoSinglePaymentReadyException();
         }
 
@@ -84,6 +86,7 @@ public class KakaoPayService {
         }
 
         // pg사 주문 번호 db 저장
+        order.setStatus(OrderStatus.KAKAO_VERIFICATION_1);
         order.setPgUid(response.getTid());
         orderRepository.save(order);
 
@@ -105,6 +108,9 @@ public class KakaoPayService {
         // DB 접근하여 주문 정보 가져오기
         Orders orders = this.getOrdersByPartnerOrderId(partner_order_id);
 
+        orders.setStatus(OrderStatus.KAKAO_VERIFICATION_2);
+        orderRepository.save(orders);
+
         parameters.add("tid", orders.getPgUid());
 
         parameters.add("partner_order_id", String.valueOf(orders.getNumber()));
@@ -125,7 +131,6 @@ public class KakaoPayService {
         } catch (RestClientException e) {
             throw new KakaoSinglePaymentApproveException();
         }
-
         // 주문 상태 DB 반영
         orders.setStatus(OrderStatus.PURCHASED);
         orderRepository.save(orders);
@@ -152,7 +157,10 @@ public class KakaoPayService {
         int cancelAmount = requestDTO.getCancel_amount();
         int totalAmount = orders.getTotalPrice();
         if (cancelAmount > totalAmount) {
+            orders.setStatus(OrderStatus.ERROR);
+            orderRepository.save(orders)
             throw new KakaoRefundVerificationAmountException();
+
         }
 
         parameters.add("cancel_amount", String.valueOf(requestDTO.getCancel_amount()));
