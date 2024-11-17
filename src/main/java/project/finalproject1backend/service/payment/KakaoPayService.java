@@ -158,7 +158,7 @@ public class KakaoPayService {
         int totalAmount = orders.getTotalPrice();
         if (cancelAmount > totalAmount) {
             orders.setStatus(OrderStatus.ERROR);
-            orderRepository.save(orders)
+            orderRepository.save(orders);
             throw new KakaoRefundVerificationAmountException();
 
         }
